@@ -48,7 +48,7 @@ const fontsConfig = Object.entries(theme.fonts.font_family)
 export default defineConfig({
   site: config.site.base_url ? config.site.base_url : "https://walkatha.pages.dev",
   base: config.site.base_path ? config.site.base_path : "/",
-  trailingSlash: config.site.trailing_slash ? "always" : "never",
+  trailingSlash: config.site.trailing_slash === true || config.site.trailing_slash === "always" ? "always" : "never",
   image: { service: sharpImageService() },
   vite: { plugins: [tailwindcss()] },
   fonts: fontsConfig,
