@@ -1,39 +1,39 @@
 {
   "site": {
-    "title": "Bookworm Light Astro | Blog Template",
-    "base_url": "https://bookworm-light-astro.vercel.app",
+    "title": "sinhala Wal Katha - සිංහල වල් කතා",
+    "base_url": "https://walkatha.pages.dev",
     "base_path": "/",
     "trailing_slash": false,
     "favicon": "/images/favicon.png",
     "logo": "/images/logo.png",
     "logo_width": "200",
     "logo_height": "34",
-    "logo_text": "Bookworm Light"
+    "logo_text": "Wal Katha"
   },
 
   "settings": {
-    "pagination": 5
+    "pagination": 6
   },
 
   "metadata": {
-    "meta_author": "Themefisher",
+    "meta_author": "Wal Katha Team",
     "meta_image": "/images/og-image.png",
-    "meta_description": "Bookworm Light Astro Blog Template"
+    "meta_description": "ලංකාවේ ජනප්‍රියම සහ අලුත්ම සිංහල වල් කතා (Sinhala Wal Katha), පවුලේ කතා, අම්මා කතා සහ සිංහල නවකතා කියවන්න ලංකාවේ හොඳම වෙබ් අඩවිය."
   },
 
   "google_tag_manager": {
-    "enable": true,
-    "gtm_id": "GTM-XXXXXX"
+    "enable": false,
+    "gtm_id": ""
   },
 
   "params": {
     "contact_form_action": "#",
-    "copyright": "Copyright © 2026 a theme by [Themefisher](https://themefisher.com)"
+    "copyright": "Copyright © 2026 [Wala Katha](https://walkatha.pages.dev)"
   },
 
   "contactinfo": {
-    "address": "355 S Grand Ave <br/> Los Angeles, CA 90071",
-    "email": "info@bookworm.org",
-    "phone": "+800 567 1234"
+    "address": "Colombo, Sri Lanka",
+    "email": "contact@walkatha.pages.dev",
+    "phone": ""
   }
 }
