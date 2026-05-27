@@ -1,25 +1,25 @@
 ---
 title: "Privacy Policy - පුද්ගලිකත්ව ප්‍රතිපත්තිය"
-meta_title: "Privacy Policy - Sinhala Wala Katha"
-description: "Wala Katha වෙබ් අඩවියේ පුද්ගලිකත්ව ප්‍රතිපත්තිය. අපගේ පරිශීලකයින්ගේ දත්ත ආරක්ෂාව පිළිබඳ සම්පූර්ණ විස්තරය මෙතැනින් කියවන්න."
+meta_title: "Privacy Policy - Sinhala Wal Katha"
+description: "Wal Katha වෙබ් අඩවියේ පුද්ගලිකත්ව ප්‍රතිපත්තිය. අපගේ පරිශීලකයින්ගේ දත්ත ආරක්ෂාව පිළිබඳ සම්පූර්ණ විස්තරය මෙතැනින් කියවන්න."
 draft: false
 ---
 
-අපගේ **Wala Katha** වෙබ් අඩවිය වෙත පැමිණෙන ඔබගේ පුද්ගලික දත්ත වල ආරක්ෂාව සහ රහස්‍යභාවය රැකගැනීම අපගේ ප්‍රමුඛතම වගකීමකි. මෙම Privacy Policy පිටුව මඟින් අප ඔබගේ දත්ත එකතු කරන්නේ කෙසේද සහ ඒවා ආරක්ෂා කරන්නේ කෙසේද යන්න පැහැදිලි කර ඇත.
+අපගේ **Wal Katha** වෙබ් අඩවිය වෙත පැමිණෙන ඔබගේ පුද්ගලික දත්ත වල ආරක්ෂාව සහ රහස්‍යභාවය රැකගැනීම අපගේ ප්‍රමුඛතම වගකීමකි. මෙම Privacy Policy පිටුව මඟින් අප ඔබගේ දත්ත එකතු කරන්නේ කෙසේද සහ ඒවා ආරක්ෂා කරන්නේ කෙසේද යන්න පැහැදිලි කර ඇත.
 
-At **Wala Katha**, accessible from our platform, one of our main priorities is the privacy of our visitors. This Privacy Policy document contains types of information that is collected and recorded by us and how we use it.
+At **Wal Katha**, accessible from our platform, one of our main priorities is the privacy of our visitors. This Privacy Policy document contains types of information that is collected and recorded by us and how we use it.
 
 ---
 
 ### 1. Log Files & Cookies
 අනෙකුත් සෑම වෙබ් අඩවියක් මෙන්ම, අපගේ සයිට් එකේ පරිශීලක අත්දැකීම (User Experience) වර්ධනය කිරීම සඳහා සහ සයිට් එකට පැමිණෙන පිරිස විශ්ලේෂණය කිරීම සඳහා අපි සාමාන්‍ය Cookies සහ Log Files භාවිතා කරනු ලබයි.
 
-Wala Katha follows a standard procedure of using log files and cookies. These files log visitors when they visit websites to analyze trends, administer the site, and track users' movement on the website.
+Wal Katha follows a standard procedure of using log files and cookies. These files log visitors when they visit websites to analyze trends, administer the site, and track users' movement on the website.
 
 ### 2. Google AdSense & Third-Party Ads
 අපගේ වෙබ් අඩවියේ දැන්වීම් ප්‍රදර්ශනය කිරීම සඳහා තෙවැනි පාර්ශවීය ඇඩ් නෙට්වර්ක් (Google AdSense / Third-Party Ad Networks) භාවිතා කිරීමට ඉඩ ඇත. ඔවුන් විසින් පරිශීලකයින්ගේ රුචිකත්වයට ගැළපෙන දැන්වීම් පෙන්වීම සඳහා Cookies (DART Cookies) භාවිතා කරනු ලැබිය හැක.
 
-Third-party ad servers or ad networks use technologies like cookies, JavaScript, or Web Beacons that are used in their respective advertisements and links that appear on Wala Katha.
+Third-party ad servers or ad networks use technologies like cookies, JavaScript, or Web Beacons that are used in their respective advertisements and links that appear on Wal Katha.
 
 ### 3. දත්ත ආරක්ෂාව (Data Protection)
 අප වෙබ් අඩවිය හරහා ඔබගේ කිසිදු පුද්ගලික තොරතුරක් (නම්, ඊමේල් ලිපිනයන්) වෙනත් කිසිම පාර්ශවයකට විකිණීම හෝ හුවමාරු කිරීම සිදු නොකරයි.
