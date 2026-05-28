@@ -11,8 +11,10 @@ const { Content } = await render(author);
 // Astro සයිට් එකේ දැනට බලන පිටුවේ සම්පූර්ණ URL එක ගැනීම
 const currentUrl = Astro.url.href;
 
-// ලේඛකයාගේ සමාජ මාධ්‍ය ලින්ක්ස් Schema එකට ගැළපෙන ලිස්ට් එකක් බවට හැරවීම
-const socialLinks = social ? social.map((item: { url: string }) => item.url) : [];
+// social කියන දත්තය Array එකක්ද කියලා 100%ක්ම තහවුරු කරගැනීම (ලෙඩ නොවෙන්න)
+const socialLinks = Array.isArray(social) 
+  ? social.map((item: { url: string }) => item.url).filter(Boolean)
+  : [];
 
 // Google වෙනුවෙන් පිරිසිදු JSON-LD Schema Markup එක සකස් කිරීම
 const authorSchema = {
