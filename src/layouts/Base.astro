@@ -19,7 +19,7 @@ export interface Props {
   title?: string;
   meta_title?: string;
   description?: string;
-  image?: any; // Astro Content Collection Image Object එකක් ගන්න නිසා string වෙනුවට any කළා
+  image?: any; 
   noindex?: boolean;
   canonical?: string;
 }
@@ -45,26 +45,54 @@ const calculatedDescription = plainify(
 // Auto-fill Keywords for Search Engines
 const siteKeywords = "Wal Katha, wala katha, wela katha, walkatha, සිංහල වැල කතා, sinhala wal katha, Wela kathaa, Sex Katha, Sex Stories, Wal Stories, Sinhala Sex, Sinhala Porn, Free Download, Sri Lanka";
 
-// Trailing Slash එක නිරාකරණය කර පිරිසිදු Canonical URL එකක් හැදීම
-const cleanPath = Astro.url.pathname.endsWith('/') ? Astro.url.pathname : `${Astro.url.pathname}/`;
-const currentCanonical = canonical ? canonical : `${config.site.base_url}${cleanPath}`;
+// --- 🌐 CANONICAL URL FORMATTING ---
+const siteUrl = config.site.base_url.endsWith("/") ? config.site.base_url.slice(0, -1) : config.site.base_url;
+const cleanPath = Astro.url.pathname.startsWith("/") ? Astro.url.pathname : `/${Astro.url.pathname}`;
+const currentCanonical = canonical ? canonical : `${siteUrl}${cleanPath}`;
 
-// --- 🖼️ 2026 SMART ABSOLUTE IMAGE EXTRACTOR ---
+// --- 🖼️ ABSOLUTE IMAGE URL RESOLVER (ROBUST METHOD) ---
 let finalImageUrl = "";
+let imageType = "image/jpeg"; // Default mime type
+
 if (image) {
-  if (typeof image === 'string') {
-    finalImageUrl = image.startsWith('http') ? image : `${config.site.base_url}${image.startsWith('/') ? image : '/' + image}`;
-  } else if (image.src) {
-    // Astro විසින් Object එකක් විදිහට ඉම්පෝට් කරන පින්තූර වල නියම ලින්ක් එක ගැනීම
-    finalImageUrl = image.src.startsWith('http') ? image.src : `${config.site.base_url}${image.src.startsWith('/') ? image.src : '/' + image.src}`;
+  if (typeof image === "string") {
+    if (image.startsWith("http")) {
+      finalImageUrl = image;
+    } else {
+      const imgPath = image.startsWith("/") ? image : `/${image}`;
+      finalImageUrl = `${siteUrl}${imgPath}`;
+    }
+  } else if (typeof image === "object" && image !== null) {
+    // Astro Content Image Object එකක Query Parameters අයින් කර පිරිසිදුම ලින්ක් එක ගැනීම
+    let imgSrc = image.src || image.url || "";
+    if (imgSrc) {
+      imgSrc = imgSrc.split("?")[0]; // ?w=1200 වගේ කෑලි තියෙනවා නම් අයින් කරනවා
+      if (imgSrc.startsWith("http")) {
+        finalImageUrl = imgSrc;
+      } else {
+        const imgPath = imgSrc.startsWith("/") ? imgSrc : `/${imgSrc}`;
+        finalImageUrl = `${siteUrl}${imgPath}`;
+      }
+    }
   }
 }
 
-// පින්තූරයක් නැත්නම් Default වැටෙන එක 100% සුරක්ෂිත කිරීම
+// Fallback to default metadata image if empty
 if (!finalImageUrl) {
-  const defaultImg = config.metadata.meta_image;
-  finalImageUrl = defaultImg.startsWith('http') ? defaultImg : `${config.site.base_url}${defaultImg.startsWith('/') ? defaultImg : '/' + defaultImg}`;
+  let defaultImg = config.metadata.meta_image || "";
+  defaultImg = defaultImg.split("?")[0];
+  if (defaultImg.startsWith("http")) {
+    finalImageUrl = defaultImg;
+  } else {
+    const imgPath = defaultImg.startsWith("/") ? defaultImg : `/${defaultImg}`;
+    finalImageUrl = `${siteUrl}${imgPath}`;
+  }
 }
+
+// Dynamic image extension detection for WhatsApp
+if (finalImageUrl.endsWith(".png")) imageType = "image/png";
+else if (finalImageUrl.endsWith(".webp")) imageType = "image/webp";
+else if (finalImageUrl.endsWith(".gif")) imageType = "image/gif";
 
 const isArticle = Astro.url.pathname !== "/" && !Astro.url.pathname.startsWith("/categories") && !Astro.url.pathname.startsWith("/tags") && !Astro.url.pathname.startsWith("/search");
 ---
@@ -104,9 +132,9 @@ const isArticle = Astro.url.pathname !== "/" && !Astro.url.pathname.startsWith("
     
     <meta property="og:image" content={finalImageUrl} />
     <meta property="og:image:secure_url" content={finalImageUrl} />
+    <meta property="og:image:type" content={imageType} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:type" content="image/jpeg" />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:url" content={currentCanonical} />
