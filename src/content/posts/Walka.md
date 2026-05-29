@@ -6,7 +6,7 @@ slug: "Walka"
 date: 2026-05-30
 image: "/images/posts/06.jpg"
 draft: false
-authors: ["වල් කතා"]
+authors: ["අනුක ලියනපෙරුම"]
 tags: ["sinhala-katha", "wala-katha", "wal-katha"]
 categories: ["lifestyle"]
 ---
