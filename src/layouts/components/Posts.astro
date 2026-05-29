@@ -24,7 +24,7 @@ const { className, posts, fluid } = Astro.props;
       <div class={i === 0 && fluid != false ? "col-12" : "col-12 sm:col-6"}>
         {post.data.image && (
           <a
-            href={`/${post.id}/`} // SEO FIX: 404 ලෙඩේ ඇති කළ අනවශ්‍ය /blog/ කෑල්ල සම්පූර්ණයෙන්ම ඉවත් කර නිවැරදි කළා
+            href={`/${post.slug}/`} // FINAL SEO FIX: අනවශ්‍ය /blog/ ඉවත් කර, post.id වෙනුවට සැබෑ post.slug එක Root එකටම ලින්ක් කළා
             class="rounded-lg block hover:text-primary overflow-hidden group"
           >
             <Image
@@ -88,7 +88,7 @@ const { className, posts, fluid } = Astro.props;
         </ul>
         <h3 class="mb-4">
           <a
-            href={`/${post.id}/`} // SEO FIX: මෙතන තිබූ අනවශ්‍ය /blog/ එකද ඉවත් කර නිවැරදි ලින්ක් එක සකස් කළා
+            href={`/${post.slug}/`} // FINAL SEO FIX: මාතෘකාවේ ලින්ක් එකද සැබෑ post.slug එකට හරවා නිවැරදි කළා
             class="block hover:text-primary transition duration-300"
           >
             {post.data.title}
