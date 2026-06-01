@@ -74,8 +74,8 @@ const { className, posts, fluid } = Astro.props;
           </a>
         </h3>
 
-        {/* POST SNIPPET: මොබයිල් තිරයේ ඉඩ මදි නිසා snippet එක hidden කර ලොකු තිර වලදී පේන්න සැලැස්සුවා */}
-        <p class="text-text text-sm line-clamp-2 mb-2 hidden sm:block">{plainify(post.body ?? "")}</p>
+        {/* POST SNIPPET: කතාවේ පේළි දෙකක් හැම තිරයකදීම පෙන්වීමට hidden ක්ලාස් එක සම්පූර්ණයෙන්ම ඉවත් කළා */}
+        <p class="text-text text-[11px] sm:text-sm line-clamp-2 mb-2 leading-snug">{plainify(post.body ?? "")}</p>
 
         {/* AUTHOR & READ MORE CONTAINER */}
         <div class="flex items-center justify-between border-t border-gray-100 pt-1.5 sm:pt-3 mt-auto">
@@ -100,7 +100,8 @@ const { className, posts, fluid } = Astro.props;
                     class="mr-1 h-4 w-4 sm:h-5 sm:w-5 rounded-full object-cover"
                   />
                 )}
-                <span class="hidden md:inline">{author.data.title}</span>
+                {/* කර්තෘගේ නම මොබයිල් ඇතුළු හැම තිරයකදීම පෙන්වීමට hidden ක්ලාස් එක ඉවත් කළා */}
+                <span>{author.data.title}</span>
               </a>
             ))}
             
