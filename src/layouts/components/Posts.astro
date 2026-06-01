@@ -27,7 +27,7 @@ const { className, posts, fluid } = Astro.props;
           <a
             href={`/blog/${post.id}/`}
             class="rounded-lg block hover:text-primary overflow-hidden group relative"
-            style="aspect-ratio: 2 / 3;" // 100% FIX: පළල වෙනස් නොකර පින්තූරය උඩට සහ පහලට තව දශමයක් දිග් කර පෙන්වීමට 2/3 ලෙස සකස් කළා
+            style="aspect-ratio: 2 / 3;" // 100% FIX: පළල වෙනස් නොකර, උස පමණක් දශමයක් උඩටයි පහලටයි දිග් කර සකස් කළා
           >
             <Image
               class="group-hover:scale-[1.04] transition duration-300 w-full h-full object-cover"
@@ -41,7 +41,7 @@ const { className, posts, fluid } = Astro.props;
           </a>
         )}
         
-        {/* INFO ROW: 😍 මොබයිල් තිරවල ඉඩ ඉතිරි කර ගැනීමට අකුරු සහ අයිකන කුඩා කළා */}
+        {/* INFO ROW: Gastro තිරවල ඉඩ ඉතිරි කර ගැනීමට අකුරු සහ අයිකන කුඩා කළා */}
         <ul class="mt-2 mb-1 flex flex-wrap items-center text-text text-[10px] sm:text-sm justify-between">
           <li class="flex items-center flex-wrap">
             <BiCategoryAlt className="mr-0.5 h-3 w-3 sm:h-[16px] sm:w-[16px] text-gray-600" />
