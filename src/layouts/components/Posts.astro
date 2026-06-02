@@ -1,10 +1,3 @@
-පහත script එකෙ මම පහතින් කියන දෙවල් පමනක් සිදු කර වෙනත් කිසිවක් අබමල් රෙනුවක තරම් වත් වෙනස් නොකර සම්පුර්ණ script එක ලබා දෙන්න👇 
-
-පොස්ට් වල තිබෙන පින්තුර පල පලල වෙනසක් නොකර එලෙසම තබාගෙන, දිග ප්‍රමනය තව දශමයක් උඩටයි පහලටයි දිග් කරන්න  පින්තුරය හොදින් පෙනෙන පරිදි👇
-
-(පකො පින්තුර වල දැන් තිබෙන පලප පොඩ්ඩක් වත් වෙනස් කරන්න එපා දශමයක් වත්❌)
-
----
 import { getSinglePage } from "@/lib/contentParser.astro";
 import dateFormat from "@/lib/utils/dateFormat";
 import { humanize, plainify, slugify } from "@/lib/utils/textConverter";
@@ -33,7 +26,7 @@ const { className, posts, fluid } = Astro.props;
           <a
             href={`/blog/${post.id}/`}
             class="rounded-lg block hover:text-primary overflow-hidden group relative"
-            style="aspect-ratio: 2 / 4;" // 100% FIX: පින්තූරය දිග් අතට නොවී හරස් අතට තව දශමයක් පලල් වීමට 3/4 කළා
+            style="aspect-ratio: 2 / 3;" // පළල වෙනස් නොකර, දිග පමණක් දශමයකින් වැඩි කිරීමට 2/3 ලෙස සකස් කරන ලදී
           >
             <Image
               class="group-hover:scale-[1.04] transition duration-300 w-full h-full object-cover"
