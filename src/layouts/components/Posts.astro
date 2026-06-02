@@ -29,8 +29,9 @@ const { className, posts, fluid } = Astro.props;
             class="rounded-lg block hover:text-primary overflow-hidden group relative"
             style="aspect-ratio: 2 / 3;" // SMART SEO & UI FIX: පළලට වඩා දිග ප්‍රමාණය තවත් වැඩි කර (2:3 Ratio) පින්තූරය හොඳින් පෙනෙන්නට සැලැස්සුවා
           >
+            {/* 100% SMART CROP FIX: object-cover වෙනුවට object-contain යොදා පින්තූරයේ කිසිදු කොටසක් කැපී නොයා සම්පූර්ණයෙන්ම පෙන්වීමට සැලැස්වීම */}
             <Image
-              class="group-hover:scale-[1.04] transition duration-300 w-full h-full object-cover"
+              class="group-hover:scale-[1.04] transition duration-300 w-full h-full object-contain"
               src={post.data.image}
               alt={post.data.title}
               width={500} // SEO & PERFORMANCE: පින්තූරයේ පළල ප්‍රමාණය දශමයකින් වැඩි කළා
