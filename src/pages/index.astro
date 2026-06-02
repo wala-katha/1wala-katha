@@ -3,7 +3,7 @@ import Posts from "@/components/Posts.astro";
 import config from "@/config/config.json";
 import Base from "@/layouts/Base.astro";
 import Pagination from "@/layouts/components/Pagination.astro";
-// 1. SMART SEO IMPORT: අලුතින් සාදාගත් FeaturedSlider Component එක නිවැරදිව සම්බන්ධ කිරීම
+// 1. FeaturedSlider Component එක නිවැරදිව සම්බන්ධ කිරීම
 import FeaturedSlider from "@/layouts/components/FeaturedSlider.astro";
 import { getSinglePage } from "@/lib/contentParser.astro";
 import { sortByDate } from "@/lib/utils/sortFunctions";
@@ -14,12 +14,14 @@ const totalPages = Math.ceil(posts.length / config.settings.pagination);
 const currentPosts = sortedPosts.slice(0, config.settings.pagination);
 ---
 
-{/* SMART SEO FIX: ගූගල් සර්ච් රොබෝලාට සයිට් එකේ ප්‍රධාන මාතෘකාව (H1 Title) පැහැදිලිව හඳුනාගැනීමට සහ Title tag එක නිවැරදිව පෙන්වීමට Base එක ඇතුළත title එකක් ලබා දුන්නා */}
 <Base title="සිංහල වල් කතා | Sinhala Wal Katha & Wela Katha Stories">
   <section class="section pt-4">
     <div class="container">
       
-      {/* 2. SLIDER INTEGRATION: පෝස්ට් ලිස්ට් එකට ඉහළින් ඔටෝ මාරු වෙන පෝස්ට් 4 ස්ලයිඩරය මෙතැනින් එකතු කළා */}
+      {/* 🚀 CRITICAL SEO FIX: ගූගල් සර්ච් එන්ජින් වලට සයිට් එකේ නම සහ ප්‍රධාන කීවර්ඩ් එක කියවන්න 'sr-only' (ස්ක්‍රීන් එකට නොපෙනෙන නමුත් රොබෝලාට පෙනෙන) H1 ටැග් එකක් එකතු කළා */}
+      <h1 class="sr-only">වල් කතා | Sinhala Wal Katha & Wela Katha Stories - නවතම කතා එකතුව</h1>
+
+      {/* 2. පෝස්ට් ලිස්ට් එකට ඉහළින් ඔටෝ මාරු වෙන පින්තූර කැට ඇනිමේෂන් ස්ලයිඩරය */}
       <FeaturedSlider posts={sortedPosts} />
 
       {/* ප්‍රධාන පෝස්ට් ලිස්ට් එක (ග්‍රිඩ් එක) */}
