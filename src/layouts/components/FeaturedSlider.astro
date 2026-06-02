@@ -1,0 +1,155 @@
+---
+import dateFormat from "@/lib/utils/dateFormat";
+import { humanize } from "@/lib/utils/textConverter";
+import { Image } from "astro:assets";
+import { BiCalendarEdit } from "react-icons/bi";
+
+// ඩෙමෝ දත්ත: පසුව ඔයාට අවශ්‍ය පරිදි මේ ලින්ක්ස් සහ මාතෘකා වෙනස් කරගත හැක
+const demoSlides = [
+  {
+    id: "mali-wal-katha", // පසුව මාරු කර ගැනීමට ඩෙමෝ පෝස්ට් ID 1
+    title: "මේල්ලිම් මෙම් - Mali Wal Katha",
+    image: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh2ZpuNRWZgp8bePG3R3eeD_ZXZAeyEciXJ5PCwoYe0-eT_KpR06b8Rh-MapoGN9ib9zJJ9dswr8I5uuqbQzNuxxZFQLBPFhvrrp4ZkPYfiE9N0XWN6Q6xW7n8ET5UxGJmU0_QDkfaJKhIwTBtsPlj12gfGN4xSLNe5e0fQziL8Iq_HO5NolS4JC_jCZdw/s708/1000021201.jpg",
+    category: "Wal Katha",
+    date: "2026-05-20"
+  },
+  {
+    id: "sinhala-lip-katha", // පසුව මාරු කර ගැනීමට ඩෙමෝ පෝස්ට් ID 2
+    title: "තුස්ලිම් මිනිසා - සිංහල ලිප් කතා",
+    image: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjqGKoIkxKvTb-z2d5JqA5-6h_Tp_s9B1iDwcrXfhlpYUUMtjWKuEvtcp0fEaDK4fx6hMK-9e9cUwGT7QdsEFFsdr6M-pi8nGfD0lbLK72Pwte3vhidlUjIkyfNrKKfBT3hMpynFT5nuwaEePOGUiZv6DBhOI4onVzsIzjyqVTB4yMx7mGV0BkjMHr0uBY/s645/1000021219.jpg",
+    category: "Wela Katha",
+    date: "2026-05-17"
+  },
+  {
+    id: "new-wal-katha", // පසුව මාරු කර ගැනීමට ඩෙමෝ පෝස්ට් ID 3
+    title: "තේශය ලබා - New Wal Katha",
+    image: "https://blogger.googleusercontent.com/img/a/AVvXsEitbUL7Rq290BuqoH832SRuty1Uy2rgX0LTqs9oA5J8GLSk8lMWTYd7eL_8Bdg1BTyof9hMkkJr0BF-Rdyzmms0OdUUhliH-0WHHPja9Vn1rjNZ6zs2WFPVoyM6KSV337NOLJqnrEoiULB-48Pt7yRG6mNoL-gsydPNgjFgFki5NGFITvziTHNkRYzSl0M=s845",
+    category: "Sinhala Stories",
+    date: "2025-04-12"
+  },
+  {
+    id: "popular-wal-katha", // පසුව මාරු කර ගැනීමට ඩෙමෝ පෝස්ට් ID 4
+    title: "නවතම සිංහල වල් කතා එකතුව - Popular Stories",
+    image: "https://blogger.googleusercontent.com/img/a/AVvXsEj-M493Zh8Vr8PEHL8uiKoKVMU45vNqM17H9fa_F6XuByYc7YC7l3OwhuGRL8oqWvq3gnTcD_3A0zlRhGDJoK_Wiljw3ftllija7XiebyhxKjhrz8FJpGeoexMXrDuVhBYv4w8e4RVPCIqcyEDjXdC9N33JxTXSsmjsBh1QWfIJM14I5znCccGriX9vdDQ=s619",
+    category: "True Story",
+    date: "2025-04-01"
+  }
+];
+---
+
+<div class="relative w-full overflow-hidden rounded-xl bg-gray-900 mb-8" id="astro-featured-slider">
+  {/* SLIDER WRAPPER */}
+  <div class="flex transition-transform duration-500 ease-in-out" id="slider-wrapper" style="width: 400%;">
+    {demoSlides.map((slide, index) => (
+      <div class="w-full flex-shrink-0 relative" style="width: 25%;">
+        {/* 100% FIX: ක්ලික් කළ විට කෙලින්ම අදාළ බ්ලොග් පෝස්ට් එකේ URL එකට යාම සිදු වේ */}
+        <a href={`/blog/${slide.id}/`} class="block w-full h-full group">
+          <div class="relative w-full aspect-[16/9] sm:aspect-[21/9] md:aspect-[24/9] bg-black">
+            <Image
+              src={slide.image}
+              alt={slide.title}
+              width={1200}
+              height={525}
+              /* SMART SEO Optimization: පළමු පින්තූරය ක්ෂණිකව LCP ලකුණු වැඩි කිරීමට eager ද, අනෙක්වා lazy ද කළා */
+              loading={index === 0 ? "eager" : "lazy"}
+              decoding="async"
+              class="w-full h-full object-contain transition duration-500 group-hover:scale-[1.02]"
+            />
+            {/* GRADIENT OVERLAY FOR TEXT READABILITY */}
+            <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
+          </div>
+          
+          {/* POST DETAILS OVERLAY */}
+          <div class="absolute bottom-0 inset-x-0 p-4 sm:p-6 md:p-8 text-white">
+            {/* CATEGORY & DATE */}
+            <div class="flex items-center gap-4 text-[11px] sm:text-xs mb-2 opacity-90">
+              <span class="bg-primary text-white px-2 py-0.5 rounded font-bold">
+                {humanize(slide.category)}
+              </span>
+              <span class="flex items-center gap-1">
+                <BiCalendarEdit class="h-3.5 w-3.5" />
+                {dateFormat(slide.date)}
+              </span>
+            </div>
+            
+            {/* TITLE */}
+            <h2 class="text-sm sm:text-lg md:text-2xl font-bold line-clamp-2 leading-tight group-hover:text-primary transition duration-300">
+              {slide.title}
+            </h2>
+          </div>
+        </a>
+      </div>
+    ))}
+  </div>
+
+  {/* NAVIGATION DOTS */}
+  <div class="absolute bottom-3 right-4 flex gap-1.5 z-10">
+    {demoSlides.map((_, index) => (
+      <button
+        class={`w-2 h-2 rounded-full transition-all duration-300 slider-dot ${index === 0 ? 'bg-primary scale-125' : 'bg-white/50'}`}
+        data-index={index}
+        aria-label={`Go to slide ${index + 1}`}
+      ></button>
+    ))}
+  </div>
+</div>
+
+{/* LIGHTWEIGHT AUTOMATIC SLIDER SCRIPT */}
+<script>
+  function initSlider() {
+    const slider = document.getElementById('astro-featured-slider');
+    const wrapper = document.getElementById('slider-wrapper');
+    const dots = document.querySelectorAll('.slider-dot');
+    
+    if (!slider || !wrapper || dots.length === 0) return;
+    
+    let currentIndex = 0;
+    const totalSlides = dots.length;
+    const intervalTime = 4000; // තත්පර 4න් 4ට ඔටෝ මාරු වීම
+    let slideInterval: any;
+
+    function updateSlider(index: number) {
+      currentIndex = index;
+      wrapper.style.transform = `translateX(-${index * 25}%)`;
+      
+      dots.forEach((dot, i) => {
+        if (i === index) {
+          dot.classList.add('bg-primary', 'scale-125');
+          dot.classList.remove('bg-white/50');
+        } else {
+          dot.classList.remove('bg-primary', 'scale-125');
+          dot.classList.add('bg-white/50');
+        }
+      });
+    }
+
+    function startInterval() {
+      slideInterval = setInterval(() => {
+        let nextIndex = (currentIndex + 1) % totalSlides;
+        updateSlider(nextIndex);
+      }, intervalTime);
+    }
+
+    function stopInterval() {
+      clearInterval(slideInterval);
+    }
+
+    dots.forEach((dot) => {
+      dot.addEventListener('click', (e) => {
+        stopInterval();
+        const index = parseInt((e.target as HTMLElement).getAttribute('data-index') || '0');
+        updateSlider(index);
+        startInterval();
+      });
+    });
+
+    slider.addEventListener('mouseenter', stopInterval);
+    slider.addEventListener('mouseleave', startInterval);
+
+    startInterval();
+  }
+
+  // Astro View Transitions සහ සාමාන්‍ය පේජ් ලෝඩ් දෙකටම සපෝට් කිරීම
+  document.addEventListener('astro:page-load', initSlider);
+  initSlider();
+</script>
