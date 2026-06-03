@@ -1,3 +1,6 @@
+// 📄 src/tailwind-plugin/tw-theme.mjs (100% FIXED FOR RICH BLACK)
+// Https://github.com/wala-katha/1wala-katha/blob/main/src/tailwind-plugin/tw-theme.mjs
+
 import plugin from "tailwindcss/plugin";
 import themeConfig from "../config/theme.json";
 
@@ -14,10 +17,34 @@ const fontFamilies = Object.entries(themeConfig.fonts.font_family)
     return acc;
   }, {});
 
+// ============================================================
+// 👑 PREMIUM DARKMODE INTEGRATION (HARDCODED FOR RICH BLACK)
+// ============================================================
+// 🎯 FIXED: defaultColorGroups එකේ අගයන් config එකෙන් (theme.json) නොගෙන, 
+// මම කෙලින්ම මෙතනට Rich Black සහ Light Text එකක් දැම්මා. 
+// එතකොට සයිට් එකේ සාමාන්‍ය Light පසුබිම Rich Black වෙනවා, අකුරු සුදු වෙනවා.
+
+const hardcodedDefaultColors = {
+  theme_color: {
+    body: "#010203",       // 🎯 Rich Black Background
+    theme_light: "#010203", // 🎯 All Theme Light Areas are also Rich Black
+    primary: "#00b5b5",     // Primary Cyan
+    dark: "#ffffff",        // 🎯 Headings (Dark) are now White for contrast
+    border: "#333333",      // Slightly lighter border
+  },
+  text_color: {
+    text: "#b0b3b8",        // 🎯 Regular text is now light gray for contrast
+    dark: "#ffffff",        // 🎯 Text dark is White
+    light: "#010203",       // (Inverted for logical reasons)
+  }
+};
+
 const defaultColorGroups = [
-  { colors: themeConfig.colors.default.theme_color, prefix: "" },
-  { colors: themeConfig.colors.default.text_color, prefix: "" },
+  { colors: hardcodedDefaultColors.theme_color, prefix: "" },
+  { colors: hardcodedDefaultColors.text_color, prefix: "" },
 ];
+
+// Darkmode කෑල්ල ඒ විදිහටම config එකෙන් එන්න ඉඩ දුන්නා (සාමාන්‍යයෙන් color.json හෝ theme.json වලින්)
 const darkColorGroups = [];
 if (themeConfig.colors.darkmode?.theme_color) {
   darkColorGroups.push({
@@ -83,7 +110,7 @@ const colorsMap = {};
 
 module.exports = plugin.withOptions(() => {
   return function ({ addBase, addUtilities, matchUtilities }) {
-    // Default vars on :root; dark vars on .dark
+    // Default vars on :root (This will now be Rich Black); dark vars on .dark
     addBase({
       ":root": baseVars,
       ".dark": darkVars,
