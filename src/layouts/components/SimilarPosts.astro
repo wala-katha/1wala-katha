@@ -15,16 +15,18 @@ const { posts } = Astro.props;
   {
     posts.map((post) => (
       /* 🎯 UI & SEO GRID FIX: මොබයිල්, ටැබ්, ඩෙස්ක්ටොප් හැම එකකදීම එක පේළියට පෝස්ට් 3 බැගින් පේළි දෙකකට පෝස්ට් 6ක් හැඩගැස්වීම */
-      <div class="col-4 flex flex-col justify-between group mb-4 text-center"> {/* ⚡ FIXED: මුළු කාඩ් එකම මැදට කිරීමට text-center යෙදුවා */}
+      <div class="col-4 flex flex-col justify-between group mb-4 text-center">
         {post.data.image && (
           <a
-            href={`/blog/${post.id}/`} /* ⚠️ FIXED: නිවැරදි Astro Content Layer URL එක දුන්නා */
-            /* 👑 PREMIUM GOLDEN FRAME BAR: පින්තූරය වටා රන්වන් පැහැති සියුම් බෝඩර් එකක් සහ hover වීමේදී රන්වන් පැහැයෙන් බැබළෙන Shadow එකක් එක් කළා */
-            class="rounded-lg block overflow-hidden group relative bg-gray-900 border-2 border-[#D4AF37]/60 hover:border-[#FFD700] transition-all duration-300 hover:shadow-[0_0_15px_rgba(212,175,55,0.5)]"
-            style="aspect-ratio: 2 / 3;" /* ⚡ හෝම් පේජ් එකේ වගේම ලස්සන කෙළින් අතට 2:3 Ratio එක දුන්නා */
+            href={`/blog/${post.id}/`} /* ⚠️ FIXED: නිවැරදි Astro Content Layer URL එක */
+            class="rounded-lg block overflow-hidden group relative bg-gray-900 transition-all duration-300"
+            style="aspect-ratio: 2 / 3;" /* ⚡ ලස්සන කෙළින් අතට 2:3 Ratio එක */
           >
+            {/* 👑 PREMIUM GOLDEN FRAME BAR FIX: 
+                බෝඩර් එක සහ ග්ලෝ එක පින්තූරයටම වැදෙන සේ සකස් කළා. 
+                Dull Gold (#D4AF37) සහ Bright Gold (#FFD700) පැහැදිලිවම කැපී පෙනේ. */}
             <Image
-              class="group-hover:scale-[1.04] transition duration-300 w-full h-full object-contain"
+              class="w-full h-full object-contain rounded-lg border-2 border-[#D4AF37] group-hover:border-[#FFD700] group-hover:scale-[1.03] transition-all duration-300 shadow-[0_0_1px_rgba(0,0,0,0)] group-hover:shadow-[0_0_18px_rgba(255,215,0,0.7)]"
               src={post.data.image}
               alt={post.data.title}
               width={500}
@@ -36,7 +38,7 @@ const { posts } = Astro.props;
         )}
         
         {/* INFO ROW: මැදට පෙළගස්වා මොබයිල් තිර වලට ගැළපෙන සේ මෙටා ඩේටා අකුරු ලස්සනට කුඩා කළා */}
-        <ul class="mt-2 mb-1 flex flex-wrap items-center text-text text-[10px] sm:text-xs justify-center gap-x-2"> {/* ⚡ FIXED: justify-center මඟින් මැදට ගන්නා ලදී */}
+        <ul class="mt-2 mb-1 flex flex-wrap items-center text-text text-[10px] sm:text-xs justify-center gap-x-2">
           <li class="flex items-center flex-wrap">
             <BiCategoryAlt className="mr-0.5 h-3 w-3 sm:h-[14px] sm:w-[14px] text-gray-600" />
             <ul>
@@ -58,7 +60,7 @@ const { posts } = Astro.props;
           </li>
         </ul>
 
-        {/* POST TITLE: ⚡ FIXED: text-center සහ mx-auto මඟින් මාතෘකාවේ දෙවැනි පේළිය පවා හරි මැදටම සකස් කරන ලදී */}
+        {/* POST TITLE: text-center සහ mx-auto මඟින් මාතෘකාවේ දෙවැනි පේළිය පවා හරි මැදටම සකස් කරන ලදී */}
         <h3 class="mb-1 line-clamp-2 leading-tight text-center mx-auto w-full">
           <a
             href={`/blog/${post.id}/`}
