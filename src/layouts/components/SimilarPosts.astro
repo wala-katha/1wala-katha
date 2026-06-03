@@ -11,51 +11,57 @@ type Props = {
 const { posts } = Astro.props;
 ---
 
-<div class="row gy-4 justify-center">
+<div class="row gy-4 gx-2 sm:gx-4 justify-center">
   {
-    posts.map((post, i: number) => (
-      <div class={`col-12 sm:col-6 md:col-4 ${i === 2 && "hidden md:block"}`}>
+    posts.map((post) => (
+      /* 🎯 UI & SEO GRID FIX: මොබයිල්, ටැබ්, ඩෙස්ක්ටොප් හැම එකකදීම එක පේළියට පෝස්ට් 3 බැගින් පේළි දෙකකට පෝස්ට් 6ක් හැඩගැස්වීම */
+      <div class="col-4 flex flex-col justify-between group mb-4">
         {post.data.image && (
           <a
-            href={`/${post.slug}`}
-            class="rounded-lg block hover:text-primary overflow-hidden group"
+            href={`/blog/${post.id}/`} /* ⚠️ FIXED: නිවැරදි Astro Content Layer URL එක දුන්නා */
+            class="rounded-lg block hover:text-primary overflow-hidden group relative bg-gray-900"
+            style="aspect-ratio: 2 / 3;" /* ⚡ හෝම් පේජ් එකේ වගේම ලස්සන කෙළින් අතට 2:3 Ratio එක දුන්නා */
           >
             <Image
-              class="group-hover:scale-[1.05] transition duration-300 w-full"
+              class="group-hover:scale-[1.04] transition duration-300 w-full h-full object-contain"
               src={post.data.image}
               alt={post.data.title}
-              width={445}
-              height={230}
+              width={500}
+              height={750}
+              loading="lazy"
+              decoding="async"
             />
           </a>
         )}
-        <ul class="mt-4 text-text flex flex-wrap items-center text-sm">
-          <li class="mb-2 mr-4 flex items-center flex-wrap font-medium">
-            <BiCalendarEdit className="mr-1 h-[16px] w-[16px] text-gray-600" />
-            {dateFormat(post.data.date!)}
-          </li>
-          <li class="mb-2 mr-4 flex items-center flex-wrap">
-            <BiCategoryAlt className="mr-1 h-[16px] w-[16px] text-gray-600" />
-
+        
+        {/* INFO ROW: මොබයිල් තිර වලට ගැළපෙන සේ මෙටා ඩේටා අකුරු ලස්සනට කුඩා කළා */}
+        <ul class="mt-2 mb-1 flex flex-wrap items-center text-text text-[10px] sm:text-xs justify-between">
+          <li class="flex items-center flex-wrap">
+            <BiCategoryAlt className="mr-0.5 h-3 w-3 sm:h-[14px] sm:w-[14px] text-gray-600" />
             <ul>
-              {post.data.categories.map((category: string, i: number) => (
+              {post.data.categories.slice(0, 1).map((category: string) => (
                 <li class="inline-block">
                   <a
-                    href={`/categories/${slugify(category)}`}
-                    class="mr-2 hover:text-primary font-medium"
+                    href={`/categories/${slugify(category)}/`}
+                    class="hover:text-primary font-bold text-[9px] sm:text-xs bg-gray-100 dark:bg-darkmode-theme-light px-1 sm:px-2 py-0.5 rounded"
                   >
                     {humanize(category)}
-                    {i !== post.data.categories.length - 1 && ","}
                   </a>
                 </li>
               ))}
             </ul>
           </li>
+          <li class="hidden xs:flex items-center flex-wrap font-medium text-[9px] sm:text-xs text-gray-500">
+            <BiCalendarEdit className="mr-0.5 h-3 w-3 sm:h-4 sm:w-4" />
+            {dateFormat(post.data.date!)}
+          </li>
         </ul>
-        <h3 class="h5">
+
+        {/* POST TITLE: line-clamp-2 දමා මාතෘකාව පේළි දෙකකට සීමා කර Grid එක එක සමානව තැබීම */}
+        <h3 class="mb-1 line-clamp-2 leading-tight">
           <a
-            href={`/${post.slug}`}
-            class="block hover:text-primary transition duration-300"
+            href={`/blog/${post.id}/`}
+            class="block hover:text-primary transition duration-300 text-[11px] sm:text-base font-bold text-dark dark:text-darkmode-text"
           >
             {post.data.title}
           </a>
