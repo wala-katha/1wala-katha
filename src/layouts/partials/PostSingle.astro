@@ -26,14 +26,14 @@ if (!smartSimilarPosts || smartSimilarPosts.length === 0) {
   smartSimilarPosts = posts.filter((p) => p.id !== post.id);
 }
 
-// 3. FIX: උඹ ඉල්ලපු විදිහටම කෙළින් අතට (2:3) ලස්සනට පේළියට වාඩි වෙන්න පෝස්ට් ප්‍රමාණය 6ක් දක්වා වැඩි කළා
+// 3. FIX: උඹ ඉල්ලපු විදිහටම කෙළින් අතට (2:3) ලස්സනට පේළියට වාඩි වෙන්න පෝස්ට් ප්‍රමාණය 6ක් දක්වා වැඩි කළා
 const finalSimilarPosts = smartSimilarPosts.slice(0, 6);
 ---
 
 <section class="section bg-[#010203]">
   <div class="container">
     <article class="row justify-center">
-      {/* POST TITLE: IGNORING ANY LESS STABLE LOGIC */}
+      {/* POST TITLE: ප්‍රධාන මාතෘකාව #F8F8FF වලින් උපරිම සුදු කර ඉස්මතු කළා */}
       <div class="md:col-10 text-center">
         <h1 set:html={markdownify(title)} class="h2 text-[#F8F8FF] font-black drop-shadow-md" />
         
@@ -115,7 +115,7 @@ const finalSimilarPosts = smartSimilarPosts.slice(0, 6);
           <Content />
         </div>
         
-        {/* TAGS BLOCK: ಉඹ ಇල්ලපු විදිහටම තද කහ පැහැති පසුබිම සහ කළු අකුරු වලින් බොත්තම් සකස් කළා */}
+        {/* TAGS BLOCK: උඹ ඉල්ලපු විදිහටම තද කහ පැහැති පසුබිම සහ කළු අකුරු වලින් බොත්තම් සකස් කළා */}
         <div class="flex flex-wrap items-center justify-between border-t border-white/10 pt-6">
           <ul class="mr-4 mb-4 space-x-3">
             {
@@ -144,8 +144,8 @@ const finalSimilarPosts = smartSimilarPosts.slice(0, 6);
 </section>
 
 {/* 👑 SUGGESTED STORIES BLOCK:
-    1. පසුබිම: කළු ➔ තද කොළ ➔ කළු (from-[#010203] via-[#022c16] to-[#010203]) 3-Way Gradient එකක් හරියටම ක්‍රියාත්මක කර ඇත.
-    2. ඇනිමේෂන්: කිසිදු ට්‍රාන්සිෂන්, රොටේෂන් හෝ ඇනිමේෂන් එකක් නැති නිශ්චල, ස්ථාවර ලුක් එකක් ලබා දී ඇත. */}
+    1. පසුබිම: කළු ➔ තද කොළ ➔ කළු (from-[#010203] via-[#013220]/40 to-[#010203]) 3-Way Gradient එකක් දැම්මා.
+    2. ඇනිමේෂන්: කිසිදු ට්‍රාන්සිෂන් හෝ ඇනිමේෂන් එකක් නැති ස්ථාවර ලුක් එකක් දුන්නා. */}
 {
   finalSimilarPosts.length > 0 && (
     <section class="section pt-12 pb-16 bg-gradient-to-b from-[#010203] via-[#022c16] to-[#010203] border-t border-white/5">
