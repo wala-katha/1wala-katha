@@ -7,74 +7,95 @@ import {
   IoLogoTwitter,
   IoLogoWhatsapp,
 } from "react-icons/io5";
-import { FaTelegram } from "react-icons/fa6"; // ටෙලිග්‍රෑම් වෙනුවෙන් නිවැරදිම ලයිබ්‍රරි එකෙන් අයිකන් එක ගත්තා
+import { FaTelegram } from "react-icons/fa6";
 
 const { base_url } = config.site;
 const { title, description, slug, className } = Astro.props;
 ---
 
-<ul class={`${className}`}>
+{/* 👑 PREMIUM SOCIAL SHARE LIST: 
+    යූසර්ට ලෙහෙසියෙන් ක්ලික් කරන්න පුළුවන් වෙන්න අයිකන අතර පරතරය ලස්සනට හැදුවා */}
+<ul class={`flex flex-wrap items-center gap-3 sm:gap-4 select-none ${className}`}>
+  
+  {/* FACEBOOK */}
   <li class="inline-block">
     <a
       aria-label="facebook share button"
       href={`https://facebook.com/sharer/sharer.php?u=${base_url}/${slug}`}
       target="_blank"
       rel="noreferrer noopener nofollow"
+      /* 🎯 BRAND COLOR HIGHLIGHT: කළු පසුබිමට ගැළපෙන නිල ෆේස්බුක් නිල් පැහැය සහ හොවර් එකේදී සියුම් Glow එකක් */
+      class="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-white/5 border border-white/10 text-[#1877F2] transition duration-300 hover:bg-[#1877F2] hover:text-white hover:border-[#1877F2] hover:shadow-[0_0_12px_rgba(24,119,242,0.5)] text-lg sm:text-xl"
     >
       <IoLogoFacebook />
     </a>
   </li>
   
+  {/* TWITTER (X) */}
   <li class="inline-block">
     <a
       aria-label="twitter share button"
       href={`https://twitter.com/intent/tweet/?text=${encodeURIComponent(title)}&url=${base_url}/${slug}`}
       target="_blank"
       rel="noreferrer noopener nofollow"
+      /* X (Twitter) සඳහා පිරිසිදු සුදු සහ හොවර් එකේදී අළු පැහැය */
+      class="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-white/5 border border-white/10 text-[#F8F8FF] transition duration-300 hover:bg-[#F8F8FF] hover:text-[#010203] hover:border-white text-lg sm:text-xl"
     >
       <IoLogoTwitter />
     </a>
   </li>
 
+  {/* WHATSAPP */}
   <li class="inline-block">
     <a
       aria-label="whatsapp share button"
       href={`https://api.whatsapp.com/send?text=${encodeURIComponent(title)}%20-%20${base_url}/${slug}`}
       target="_blank"
       rel="noreferrer noopener nofollow"
+      /* නිල වට්ස්ඇප් කොළ පැහැය සහ හොවර් Glow එක */
+      class="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-white/5 border border-white/10 text-[#25D366] transition duration-300 hover:bg-[#25D366] hover:text-white hover:border-[#25D366] hover:shadow-[0_0_12px_rgba(37,211,102,0.5)] text-lg sm:text-xl"
     >
       <IoLogoWhatsapp />
     </a>
   </li>
 
+  {/* TELEGRAM */}
   <li class="inline-block">
     <a
       aria-label="telegram share button"
       href={`https://t.me/share/url?url=${base_url}/${slug}&text=${encodeURIComponent(title)}`}
       target="_blank"
       rel="noreferrer noopener nofollow"
+      /* ටෙලිග්‍රෑම් නිල් පැහැය */
+      class="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-white/5 border border-white/10 text-[#26A5E4] transition duration-300 hover:bg-[#26A5E4] hover:text-white hover:border-[#26A5E4] hover:shadow-[0_0_12px_rgba(38,165,228,0.5)] text-lg sm:text-xl"
     >
       <FaTelegram />
     </a>
   </li>
 
+  {/* LINKEDIN */}
   <li class="inline-block">
     <a
       aria-label="linkedin share button"
       href={`https://www.linkedin.com/shareArticle?mini=true&url=${base_url}/${slug}&title=${encodeURIComponent(title)}&summary=${encodeURIComponent(description)}&source=${base_url}`}
       target="_blank"
       rel="noreferrer noopener nofollow"
+      /* ලින්ක්ඩ්ඉන් නිල් පැහැය */
+      class="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-white/5 border border-white/10 text-[#0077B5] transition duration-300 hover:bg-[#0077B5] hover:text-white hover:border-[#0077B5] hover:shadow-[0_0_12px_rgba(0,119,181,0.5)] text-lg sm:text-xl"
     >
       <IoLogoLinkedin />
     </a>
   </li>
 
+  {/* PINTEREST */}
   <li class="inline-block">
     <a
       aria-label="pinterest share button"
       href={`https://pinterest.com/pin/create/button/?url=${base_url}/${slug}&media=&description=${encodeURIComponent(description)}`}
       target="_blank"
       rel="noreferrer noopener nofollow"
+      /* පින්ටරෙස්ට් තද රතු පැහැය */
+      class="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-white/5 border border-white/10 text-[#BD081C] transition duration-300 hover:bg-[#BD081C] hover:text-white hover:border-[#BD081C] hover:shadow-[0_0_12px_rgba(189,8,28,0.5)] text-lg sm:text-xl"
     >
       <IoLogoPinterest />
     </a>
