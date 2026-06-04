@@ -13,9 +13,9 @@ const { base_url } = config.site;
 const { title, description, slug, className } = Astro.props;
 ---
 
-{/* 👑 PREMIUM SOCIAL SHARE LIST: 
-    යූසර්ට ලෙහෙසියෙන් ක්ලික් කරන්න පුළුවන් වෙන්න අයිකන අතර පරතරය ලස්සනට හැදුවා */}
-<ul class={`flex flex-wrap items-center gap-3 sm:gap-4 select-none ${className}`}>
+{/* 👑 PREMIUM LARGE SOCIAL SHARE LIST: 
+    බොත්තම් ලොකු කරපු නිසා ඒවා එකිනෙක නොගැටී පිරිසිදුව පෙනීමට gap-3.5 සහ sm:gap-4.5 දක්වා පරතරය වැඩි කළා */}
+<ul class={`flex flex-wrap items-center gap-3.5 sm:gap-4.5 select-none ${className}`}>
   
   {/* FACEBOOK */}
   <li class="inline-block">
@@ -24,8 +24,9 @@ const { title, description, slug, className } = Astro.props;
       href={`https://facebook.com/sharer/sharer.php?u=${base_url}/${slug}`}
       target="_blank"
       rel="noreferrer noopener nofollow"
-      /* 🎯 BRAND COLOR HIGHLIGHT: කළු පසුබිමට ගැළපෙන නිල ෆේස්බුක් නිල් පැහැය සහ හොවර් එකේදී සියුම් Glow එකක් */
-      class="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-white/5 border border-white/10 text-[#1877F2] transition duration-300 hover:bg-[#1877F2] hover:text-white hover:border-[#1877F2] hover:shadow-[0_0_12px_rgba(24,119,242,0.5)] text-lg sm:text-xl"
+      /* 🎯 UI HIGHLIGHT FIX: බොත්තම් h-11 w-11 (මොබයිල්) සහ sm:h-12 sm:w-12 (ඩෙස්ක්ටොප්) දක්වා විශාල කර, 
+         අයිකන වල ප්‍රමාණය text-xl sm:text-2xl ලෙස උපරිම පැහැදිලි මට්ටමට ගෙන ආවා */
+      class="flex h-11 w-11 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-white/5 border border-white/10 text-[#1877F2] transition duration-300 hover:bg-[#1877F2] hover:text-white hover:border-[#1877F2] hover:shadow-[0_0_15px_rgba(24,119,242,0.6)] text-xl sm:text-2xl"
     >
       <IoLogoFacebook />
     </a>
@@ -38,8 +39,7 @@ const { title, description, slug, className } = Astro.props;
       href={`https://twitter.com/intent/tweet/?text=${encodeURIComponent(title)}&url=${base_url}/${slug}`}
       target="_blank"
       rel="noreferrer noopener nofollow"
-      /* X (Twitter) සඳහා පිරිසිදු සුදු සහ හොවර් එකේදී අළු පැහැය */
-      class="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-white/5 border border-white/10 text-[#F8F8FF] transition duration-300 hover:bg-[#F8F8FF] hover:text-[#010203] hover:border-white text-lg sm:text-xl"
+      class="flex h-11 w-11 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-white/5 border border-white/10 text-[#F8F8FF] transition duration-300 hover:bg-[#F8F8FF] hover:text-[#010203] hover:border-white text-xl sm:text-2xl"
     >
       <IoLogoTwitter />
     </a>
@@ -52,8 +52,7 @@ const { title, description, slug, className } = Astro.props;
       href={`https://api.whatsapp.com/send?text=${encodeURIComponent(title)}%20-%20${base_url}/${slug}`}
       target="_blank"
       rel="noreferrer noopener nofollow"
-      /* නිල වට්ස්ඇප් කොළ පැහැය සහ හොවර් Glow එක */
-      class="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-white/5 border border-white/10 text-[#25D366] transition duration-300 hover:bg-[#25D366] hover:text-white hover:border-[#25D366] hover:shadow-[0_0_12px_rgba(37,211,102,0.5)] text-lg sm:text-xl"
+      class="flex h-11 w-11 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-white/5 border border-white/10 text-[#25D366] transition duration-300 hover:bg-[#25D366] hover:text-white hover:border-[#25D366] hover:shadow-[0_0_15px_rgba(37,211,102,0.6)] text-xl sm:text-2xl"
     >
       <IoLogoWhatsapp />
     </a>
@@ -66,8 +65,7 @@ const { title, description, slug, className } = Astro.props;
       href={`https://t.me/share/url?url=${base_url}/${slug}&text=${encodeURIComponent(title)}`}
       target="_blank"
       rel="noreferrer noopener nofollow"
-      /* ටෙලිග්‍රෑම් නිල් පැහැය */
-      class="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-white/5 border border-white/10 text-[#26A5E4] transition duration-300 hover:bg-[#26A5E4] hover:text-white hover:border-[#26A5E4] hover:shadow-[0_0_12px_rgba(38,165,228,0.5)] text-lg sm:text-xl"
+      class="flex h-11 w-11 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-white/5 border border-white/10 text-[#26A5E4] transition duration-300 hover:bg-[#26A5E4] hover:text-white hover:border-[#26A5E4] hover:shadow-[0_0_15px_rgba(38,165,228,0.6)] text-xl sm:text-2xl"
     >
       <FaTelegram />
     </a>
@@ -80,8 +78,7 @@ const { title, description, slug, className } = Astro.props;
       href={`https://www.linkedin.com/shareArticle?mini=true&url=${base_url}/${slug}&title=${encodeURIComponent(title)}&summary=${encodeURIComponent(description)}&source=${base_url}`}
       target="_blank"
       rel="noreferrer noopener nofollow"
-      /* ලින්ක්ඩ්ඉන් නිල් පැහැය */
-      class="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-white/5 border border-white/10 text-[#0077B5] transition duration-300 hover:bg-[#0077B5] hover:text-white hover:border-[#0077B5] hover:shadow-[0_0_12px_rgba(0,119,181,0.5)] text-lg sm:text-xl"
+      class="flex h-11 w-11 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-white/5 border border-white/10 text-[#0077B5] transition duration-300 hover:bg-[#0077B5] hover:text-white hover:border-[#0077B5] hover:shadow-[0_0_15px_rgba(0,119,181,0.6)] text-xl sm:text-2xl"
     >
       <IoLogoLinkedin />
     </a>
@@ -94,8 +91,7 @@ const { title, description, slug, className } = Astro.props;
       href={`https://pinterest.com/pin/create/button/?url=${base_url}/${slug}&media=&description=${encodeURIComponent(description)}`}
       target="_blank"
       rel="noreferrer noopener nofollow"
-      /* පින්ටරෙස්ට් තද රතු පැහැය */
-      class="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-white/5 border border-white/10 text-[#BD081C] transition duration-300 hover:bg-[#BD081C] hover:text-white hover:border-[#BD081C] hover:shadow-[0_0_12px_rgba(189,8,28,0.5)] text-lg sm:text-xl"
+      class="flex h-11 w-11 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-white/5 border border-white/10 text-[#BD081C] transition duration-300 hover:bg-[#BD081C] hover:text-white hover:border-[#BD081C] hover:shadow-[0_0_15px_rgba(189,8,28,0.6)] text-xl sm:text-2xl"
     >
       <IoLogoPinterest />
     </a>
