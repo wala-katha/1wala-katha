@@ -1,6 +1,7 @@
 ---
 const { source, className } = Astro.props;
-import DynamicIcon from "@/helpers/DynamicIcon";
+// ⚠️ සාමාන්‍ය React Import එක වෙනුවට, Astro 100% Support කරන Dynamic Component එක නිවැරදිව Import කිරීම
+import DynamicIcon from "@/helpers/DynamicIcon.jsx"; // .jsx හරි .tsx හරි Path එක තහවුරු කරගන්න.
 
 export interface ISocial {
   name: string;
@@ -8,32 +9,27 @@ export interface ISocial {
   link: string;
 }
 
-// React-icons major brands map with official brand colors
-const iconMap: Record<string, { icon: string; color: string }> = {
-  facebook: { icon: "FaFacebook", color: "#1877F2" },
-  x: { icon: "FaXTwitter", color: "#F8F8FF" }, // X/Twitter is now white/black. On black BG, use white.
-  instagram: { icon: "FaInstagram", color: "#E4405F" }, // Instagram gradient-like solid
-  linkedin: { icon: "FaLinkedin", color: "#0077B5" },
-  youtube: { icon: "FaYoutube", color: "#FF0000" },
-  whatsapp: { icon: "FaWhatsapp", color: "#25D366" },
-  telegram: { icon: "FaTelegram", color: "#26A5E4" },
-  pinterest: { icon: "FaPinterest", color: "#BD081C" },
+// Map frontmatter keys to react-icons names used by DynamicIcon
+const iconMap: Record<string, string> = {
+  facebook: "FaFacebook",
+  x: "FaXTwitter",
+  instagram: "FaInstagram",
+  linkedin: "FaLinkedin",
+  youtube: "FaYoutube",
+  pennant: "FaPennant", // ඩෙමෝ එකක තිබූ පෙන්ඩන්ට් එකක් සඳහා
 };
 
-const normalize = (src: any): (ISocial & { color?: string })[] => {
+const normalize = (src: any): ISocial[] => {
   if (!src) return [];
-  if (Array.isArray(src)) return src as (ISocial & { color?: string })[];
+  if (Array.isArray(src)) return src as ISocial[];
   if (typeof src === "object" && src !== null) {
-    return Object.entries(src).map(([name, link]) => {
-      const lowerName = String(name).toLowerCase();
-      const mapped = iconMap[lowerName];
-      return {
-        name,
-        link: String(link),
-        icon: mapped?.icon || `Fa${String(name).charAt(0).toUpperCase()}${String(name).slice(1)}`,
-        color: mapped?.color || "#F8F8FF", // Fallback to white on black
-      };
-    });
+    return Object.entries(src).map(([name, link]) => ({
+      name,
+      link: String(link),
+      icon:
+        iconMap[String(name).toLowerCase()] ||
+        `Fa${String(name).charAt(0).toUpperCase()}${String(name).slice(1)}`,
+    }));
   }
   return [];
 };
@@ -41,24 +37,24 @@ const normalize = (src: any): (ISocial & { color?: string })[] => {
 const items = normalize(source);
 ---
 
-{/* 👑 PREMIUM SMART SOCIAL LINKS WRAPPER:
-    කළු පසුබිම මත පට්ටම ලස්සනට වෙන් වෙලා පේනවා. select-none මගින් අකුරු තෝරා ගැනීම වැළැක්වීම. */}
-<ul class={`flex flex-wrap items-center gap-3 select-none ${className}`}>
+{/* 👑 PREMIUM DARK-READY SOCIAL LIST: 
+    යූසර්ට මොබයිල් එකකදී ඇඟිල්ලෙන් ක්ලික් කරන්න පහසු වෙන්න අයිකන අතර පරතරය gap-x-2 සිට gap-x-3 දක්වා වැඩි කළා */}
+<ul class={`flex flex-wrap items-center gap-x-3 ${className}`}>
   {
-    items.map((social: ISocial & { color?: string }) => (
-      /* 🎯 UI HIGHLIGHT FIX: h-10 w-10 වටා සියුම් white/10 පසුබිමක් සහ white/20 සියුම් සුදු බෝඩරයක් සහිත රවුම් හැඩයක්.
-         හොවර් එකේදී නිල වර්ණය (Glow Effect) පිටවන සේ හැදුවා. text-xl. */
+    items.map((social: ISocial) => (
       <li class="inline-block">
         <a
           aria-label={social.name}
           href={social.link}
           target="_blank"
           rel="noopener noreferrer nofollow"
-          class="flex h-10 w-10 items-center justify-center rounded-full bg-white/5 border border-white/20 transition duration-300 hover:text-white hover:border-current hover:shadow-[0_0_15px_currentColor] text-xl"
-          style={`color: ${social.color};`}
+          /* 🎯 Contrast & UI Fix for Black Background: 
+             සාමාන්‍ය වෙලාවට තද සුදු පැහැය (#F8F8FF/80) දීලා, හොවර් එකේදී සයිට් එකේ තීම් Teal (#01AD9F) පැහැයෙන් ඉස්මතු කිරීම */
+          class="block text-[#F8F8FF]/80 transition duration-300 hover:text-[#01AD9F]"
         >
           <span class="sr-only">{social.name}</span>
-          <DynamicIcon className="inline-block" icon={social.icon} />
+          {/* 👑 Icon Size Fix: අයිකන වල ප්‍රමාණය h-5 w-5 (ඩෙස්ක්ටොප්) දක්වා පිළිවෙළ කළා */}
+          <DynamicIcon className="inline-block h-5 w-5 sm:h-5 sm:w-5" icon={social.icon} />
         </a>
       </li>
     ))
