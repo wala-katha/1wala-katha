@@ -10,51 +10,64 @@ type Props = {
 const { authors } = Astro.props;
 ---
 
-<div class="row justify-center">
+<div class="row justify-center gy-4">
   {
     authors.map((author) => (
       <div 
-        class="col-12 mb-8 sm:col-6 md:col-4"
+        class="col-12 sm:col-6 md:col-4 flex"
         itemscope 
         itemtype="https://schema.org/Person"
       >
-        {author.data.image && (
-          <div class="mb-4">
-            <Image
-              src={author.data.image}
-              alt={author.data.title}
-              height={150}
-              width={150}
-              itemprop="image"
-              loading="lazy"
-              decoding="async"
-              class="mx-auto rounded-lg"
-            />
-          </div>
-        )}
-        <h3 class="h4 mt-8 mb-3">
-          <a
-            href={`/authors/${author.id}/`} // URL වෙනස් නොකර අගට Trailing Slash පමණක් යෙදුවා
-            itemprop="url"
-            class="block hover:text-primary transition duration-200"
-          >
-            <span itemprop="name">{author.data.title}</span>
-          </a>
-        </h3>
-        {author.body && (
-          <p 
-            class="mb-3" 
-            itemprop="description" 
-            set:text={markdownify(author.body.slice(0, 100))} 
-          />
-        )}
+        {/* 👑 PREMIUM DARK CARD CONTAINER: 
+            කළු පසුබිම මත කතුවරයාගේ කාඩ් එක වෙන් කර ඉස්මතු කිරීමට සියුම් বෝඩරයක් (`border-white/10`) 
+            සහ හොවර් එකේදී මෘදුව ඉස්මතු වන `hover:border-white/30` ඉෆෙක්ට් එක යෙදීම. */}
+        <div class="w-full bg-white/5 border border-white/10 rounded-2xl p-6 flex flex-col items-center text-center transition-all duration-300 hover:border-white/30 hover:bg-white/10 group">
+          
+          {author.data.image && (
+            <div class="mb-4 relative overflow-hidden rounded-full border-2 border-white/20 group-hover:border-[#01AD9F] transition-all duration-300 w-[120px] h-[120px]">
+              <Image
+                src={author.data.image}
+                alt={author.data.title}
+                height={120}
+                width={120}
+                itemprop="image"
+                loading="lazy"
+                decoding="async"
+                class="w-full h-full object-cover"
+              />
+            </div>
+          )}
 
-        <a
-          href={`/authors/${author.id}/`}
-          class="inline-flex items-center text-primary transition duration-200 hover:opacity-70"
-        >
-          Read More <BsArrowRightCircle className="inline ml-2" />
-        </a>
+          {/* AUTHOR NAME: කළු පසුබිම මත උපරිමයෙන්ම පෙනීමට තද සුදු (#F8F8FF) සහ font-black (Extra Bold) කිරීම */}
+          <h3 class="h5 mt-4 mb-2">
+            <a
+              href={`/authors/${author.id}/`}
+              itemprop="url"
+              class="block text-[#F8F8FF] hover:text-[#01AD9F] transition duration-200 font-black"
+            >
+              <span itemprop="name">{author.data.title}</span>
+            </a>
+          </h3>
+
+          {/* AUTHOR DESCRIPTION: හැඳින්වීම කියවීමට පහසු ලා සුදු පැහැයකට හැරවීම */}
+          {author.body && (
+            <p 
+              class="text-[#F8F8FF]/70 text-sm mb-6 line-clamp-2 leading-relaxed flex-grow" 
+              itemprop="description" 
+              set:text={markdownify(author.body.slice(0, 100))} 
+            />
+          )}
+
+          {/* READ MORE BUTTON: සයිට් එකේ ප්‍රධාන වර්ණය වන #010203 ට වඩා කැපී පෙනෙන #01AD9F (Teal) පැහැයෙන් බොත්තම සකස් කිරීම */}
+          <a
+            href={`/authors/${author.id}/`}
+            class="inline-flex items-center justify-center w-full px-4 py-2 text-xs font-black text-white bg-[#01AD9F] rounded-xl transition duration-300 hover:bg-opacity-90 gap-2 shadow-sm"
+            aria-label={`Read more about ${author.data.title}`}
+          >
+            Read Profile <BsArrowRightCircle className="inline text-base" />
+          </a>
+          
+        </div>
       </div>
     ))
   }
