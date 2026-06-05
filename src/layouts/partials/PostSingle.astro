@@ -30,16 +30,17 @@ if (!smartSimilarPosts || smartSimilarPosts.length === 0) {
 const finalSimilarPosts = smartSimilarPosts.slice(0, 6);
 ---
 
-<section class="section bg-[#010203]">
+{/* 🎯 SEO FIX: මුළු සෙක්ෂන් එකම Google Rich Snippets වලට අහුවෙන්න BlogPosting Schema ඇතුළත් කළා */}
+<section class="section bg-[#010203]" itemscope itemtype="http://schema.org/BlogPosting">
   <div class="container">
     <article class="row justify-center">
       {/* POST TITLE: ප්‍රධාන මාතෘකාව #F8F8FF වලින් උපරිම සුදු කර ඉස්මතු කළා */}
       <div class="md:col-10 text-center">
-        <h1 set:html={markdownify(title)} class="h2 text-[#F8F8FF] font-black drop-shadow-md" />
+        <h1 itemprop="headline" set:html={markdownify(title)} class="h2 text-[#F8F8FF] font-black drop-shadow-md" />
         
         {/* META INFO ROW: මෙටා ඩේටා සහ අයිකන කළු පසුබිමට කැපී පෙනෙන සේ සැකසීම */}
         <ul class="mt-4 flex flex-wrap items-center justify-center text-[#F8F8FF]/90">
-          <li class="mx-3">
+          <li class="mx-3" itemprop="author" itemscope itemtype="http://schema.org/Person">
             {
               allAuthors
                 .filter((author) =>
@@ -49,6 +50,7 @@ const finalSimilarPosts = smartSimilarPosts.slice(0, 6);
                 )
                 .map((author) => (
                   <a
+                    itemprop="url"
                     href={`/authors/${slugify(author.id)}`}
                     class="flex items-center hover:text-primary font-bold text-[#F8F8FF]"
                   >
@@ -59,16 +61,17 @@ const finalSimilarPosts = smartSimilarPosts.slice(0, 6);
                         height={50}
                         width={50}
                         class="mr-2 h-6 w-6 rounded-full border border-white/20"
+                        itemprop="image"
                       />
                     )}
-                    <span>{author.data.title}</span>
+                    <span itemprop="name">{author.data.title}</span>
                   </a>
                 ))
             }
           </li>
           <li class="mx-3 flex items-center flex-wrap font-semibold text-[#F8F8FF]">
             <BiCalendarEdit className="mr-1 h-5 w-5 text-[#01AD9F]" />
-            {dateFormat(date)}
+            <time datetime={date} itemprop="datePublished">{dateFormat(date)}</time>
           </li>
           <li class="mx-3 flex items-center flex-wrap">
             <BiCategoryAlt className="mr-1 h-[18px] w-[18px] text-[#01AD9F]" />
@@ -102,6 +105,7 @@ const finalSimilarPosts = smartSimilarPosts.slice(0, 6);
               alt={title}
               class="rounded-lg w-full h-auto object-cover mx-auto max-w-4xl border border-white/10"
               loading="eager"
+              itemprop="image"
             />
           )
         }
@@ -109,13 +113,13 @@ const finalSimilarPosts = smartSimilarPosts.slice(0, 6);
 
       <div class="md:col-10">
         {/* 👑 ULTIMATE POST CONTENT TYPOGRAPHY FIX: 
-            පෝස්ට් එක ඇතුළේ Markdown වලින් ජෙනරේට් වෙන සියලුම අකුරු, පේළි, ලිස්ට්, බ්ලොක්කෝට්ස්, 
-            මාතෘකා සියල්ල කළු පසුබිම මත උපරිමයෙන්ම පෙනීමට #F8F8FF සහ Tailwind custom css යෙදුවා */}
-        <div class="content mb-16 text-left text-[#F8F8FF] custom-post-content">
+            පෝස්ට් එකේ අකුරු වල පැහැදිලි බව (Readability) සහ Google SEO Counter එක උපරිම කිරීමට 
+            itemprop="articleBody" සහ නවීන ඩාර්ක් ස්ටයිලින් යෙදුවා */}
+        <div itemprop="articleBody" class="content mb-16 text-left text-[#E2E8F0] custom-post-content prose prose-invert max-w-none">
           <Content />
         </div>
         
-        {/* TAGS BLOCK: උඹ ඉල්ලපු විදිහටම තද කහ පැහැති පසුබිම සහ කළු අකුරු වලින් බොත්තම් සකස් කළා */}
+        {/* TAGS BLOCK: තද කහ පැහැති පසුබිම සහ කළු අකුරු වලින් බොත්තම් සකස් කළා */}
         <div class="flex flex-wrap items-center justify-between border-t border-white/10 pt-6">
           <ul class="mr-4 mb-4 space-x-3">
             {
@@ -144,16 +148,16 @@ const finalSimilarPosts = smartSimilarPosts.slice(0, 6);
 </section>
 
 {/* 👑 SUGGESTED STORIES BLOCK:
-    1. පසුබිම: කළු ➔ තද කොළ ➔ කළු (from-[#010203] via-[#013220]/40 to-[#010203]) 3-Way Gradient එකක් දැම්මා.
-    2. ඇනිමේෂන්: කිසිදු ට්‍රාන්සිෂන් හෝ ඇනිමේෂන් එකක් නැති ස්ථාවර ලුක් එකක් දුන්නා. */}
+    1. පසුබිම: කළු ➔ තද කොළ ➔ කළු (from-[#010203] via-[#022c16] to-[#010203]) 3-Way Gradient එකක් දැම්මා.
+    2. 🎯 SEO FIX: Heading Hierarchy එක නිවැරදි කිරීමට මෙතන තිබූ h2 එක h3 දක්වා වෙනස් කළා (Semantic HTML). */}
 {
   finalSimilarPosts.length > 0 && (
     <section class="section pt-12 pb-16 bg-gradient-to-b from-[#010203] via-[#022c16] to-[#010203] border-t border-white/5">
       <div class="container">
         {/* ටයිටල් එක හරියටම මැදට (text-center) ගෙන, පැති බෝඩර් ඉවත් කර පිරිසිදු තද සුදු කර ඉස්මතු කළා */}
-        <h2 class="mb-8 font-black text-center h4 text-[#F8F8FF]">
+        <h3 class="mb-8 font-black text-center h4 text-[#F8F8FF]">
           ඔබ කැමති විය හැකි තවත් කතා (Suggested Stories)
-        </h2>
+        </h3>
         
         <div class="row">
           <SimilarPosts posts={finalSimilarPosts} />
@@ -164,19 +168,32 @@ const finalSimilarPosts = smartSimilarPosts.slice(0, 6);
 }
 
 {/* ⚡ SCOPED CSS FOR ADVANCED TYPOGRAPHY COMPATIBILITY:
-    Markdown මඟින් එන ඕනෑම ඡේදයක් හෝ Span එකක් නිතැතින්ම #F8F8FF වන බව සනාථ කිරීමේ SEO ආරක්ෂක පියවරක් */}
+    කළු පසුබිමක දිගු ලිපි කියවීමේදී ඇස් වෙහෙසට පත් නොවන ලෙස ප්‍රධාන ඡේද සියුම් Off-white (e2e8f0) කර,
+    මාතෘකා සහ තද අකුරු (strong) පිරිසිදු තද සුදු (#F8F8FF) වන සේ නිවැරදි කළා. */}
 <style is:global>
   .custom-post-content p, 
-  .custom-post-content span, 
-  .custom-post-content li,
+  .custom-post-content li {
+    color: #E2E8F0 !important;
+    line-height: 1.8 !important;
+    font-size: 1.125rem !important;
+  }
+  .custom-post-content span,
   .custom-post-content strong,
   .custom-post-content h1,
   .custom-post-content h2,
   .custom-post-content h3,
   .custom-post-content h4 {
     color: #F8F8FF !important;
+    font-weight: 800 !important;
+  }
+  .custom-post-content blockquote {
+    border-left: 4px solid #01AD9F !important;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 1rem;
+    border-radius: 0.5rem;
   }
   .custom-post-content blockquote p {
-    color: #F8F8FF/80 !important;
+    color: #CBD5E1 !important;
+    font-style: italic;
   }
 </style>
