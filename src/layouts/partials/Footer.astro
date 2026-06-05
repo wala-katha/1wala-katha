@@ -33,10 +33,11 @@ import { markdownify } from "@/lib/utils/textConverter";
       }
     </ul>
 
-    {/* 👑 EXPANDED 3D DEEP HORIZONTAL CONTAINER (පිටුවේ පළලට යන 3D ලොකු කොටුව) */}
-    <div class="w-full max-w-4xl mx-auto mb-10 px-4 sm:px-8">
-      <div class="w-full py-6 px-6 sm:px-12 rounded-2xl border border-white/[0.06] bg-gradient-to-b from-[#0b0c0e] to-[#040506] shadow-[inset_0_4px_20px_rgba(0,0,0,0.9),0_2px_4px_rgba(255,255,255,0.03)]">
-        {/* අයිකන එකිනෙකට ඈත් කර පෙන්වන 3D ක්ලාස් එක */}
+    {/* 👑 EXPANDED 3D DEEP HORIZONTAL CONTAINER */}
+    {/* 🎯 FIX: මුළු පිටුවේම පළල ලස්සනට කවර් වෙන්න max-w-5xl කරලා, ඇතුළත padding වැඩි කළා */}
+    <div class="w-full max-w-5xl mx-auto mb-10 px-2 sm:px-6">
+      <div class="w-full py-6 px-4 sm:px-10 rounded-2xl border border-white/[0.06] bg-gradient-to-b from-[#0b0c0e] to-[#040506] shadow-[inset_0_4px_25px_rgba(0,0,0,0.95),0_2px_4px_rgba(255,255,255,0.03)]">
+        {/* Astro Scoping බග් එක නැති කරන්න "social-icons-3d-expanded" ක්ලාස් එක පාවිච්චි කිරීම */}
         <Social source={social.main} className="social-icons-3d-expanded" />
       </div>
     </div>
@@ -49,127 +50,110 @@ import { markdownify } from "@/lib/utils/textConverter";
   </div>
 </footer>
 
-{/* 🛠️ ADVANCED 3D BRAND-COLORED STYLE INJECTION */}
+{/* 🛠️ 100% FIX FOR ASTRO COMPONENT SCOPING BUG (Using :global) */}
 <style is:global>
-  /* ලොකු කොටුව ඇතුළේ අයිකන පිටුවේ පලලට ඈත් කිරීම */
+  /* 🎯 CRUCIAL FIX: Social Component එක ඇතුළේ තියෙන <ul> එකට 100% පළල දීලා අයිකන ඈත් කිරීම */
+  .social-icons-3d-expanded,
   .social-icons-3d-expanded ul {
-    display: flex;
-    align-items: center;
-    /* 🎯 පිටුවේ පළලට සමානව අයිකන එකිනෙකට ඈත් කිරීම (Space Between/Around වෙනුවට මුළු ඉඩම බෙදා ගැනීම) */
-    justify-content: space-around; 
-    gap: 1.5rem;
-    flex-wrap: wrap;
-    width: 100%;
-    margin: 0;
-    padding: 0;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important; /* ඈතටම විහිදී යන සේ */
+    width: 100% !important;
+    gap: 0.75rem !important;
+    flex-wrap: nowrap !important; /* මොබයිල් වලදීත් එක පේළියට තියාගැනීමට */
+    margin: 0 !important;
+    padding: 0 !important;
+    list-style: none !important;
   }
   
   .social-icons-3d-expanded li {
-    display: inline-block;
-    flex-grow: 1;
-    max-w: 60px; /* මොබයිල් වලදී ඕනෑවට වඩා විශාල වීම වැළැක්වීමට */
+    display: block !important;
+    flex: 1 !important; /* හැම එකකටම සමාන පළලක් බෙදා දීම */
+    max-w: 75px !important;
   }
   
   .social-icons-3d-expanded a {
-    display: flex;
-    width: 3.2rem;
-    height: 3.2rem;
+    display: flex !important;
+    width: 100% !important;
+    max-w: 3.5rem;
+    height: 3.5rem;
     align-items: center;
     justify-content: center;
-    border-radius: 0.85rem;
+    border-radius: 0.95rem;
     margin: 0 auto;
-    
-    /* 📦 අයිකන වටේ තියෙන බෝඩර් ලයින් එක */
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    
-    /* 🖤 Base 3D Dark Matte Background */
-    background: linear-gradient(135deg, #1e2024 0%, #0f1012 100%);
-    
-    /* 3D Shadows */
-    box-shadow: 
-      0 6px 12px rgba(0, 0, 0, 0.6), 
-      inset 0 1px 1px rgba(255, 255, 255, 0.08), 
-      inset 0 -3px 6px rgba(0, 0, 0, 0.7);
-      
-    color: #9ca3af;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Smooth Pop-out effect */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
   }
 
   .social-icons-3d-expanded svg {
-    width: 1.4rem;
-    height: 1.4rem;
-    transition: transform 0.3s ease;
+    width: 1.5rem;
+    height: 1.5rem;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8)) !important;
   }
 
   /* ==========================================================
-     👑 SMART 3D BRAND COLORS ON HOVER (සොසල් මීඩියා වල ඇත්තම පාට)
+     👑 3D BRAND COLORS - NORMAL STATE (සාමාන්‍ය වෙලාවට කළු-සුදු 3D Mix)
+     ========================================================== */
+  .social-icons-3d-expanded a:not(:hover) {
+    background: linear-gradient(135deg, #222428 0%, #0b0c0e 100%) !important;
+    box-shadow: 
+      0 6px 12px rgba(0, 0, 0, 0.5), 
+      inset 0 1px 1px rgba(255, 255, 255, 0.08), 
+      inset 0 -3px 6px rgba(0, 0, 0, 0.7) !important;
+    color: #a3a3a3 !important; /* මෘදු සුදු-අළු මික්ස් */
+  }
+
+  /* ==========================================================
+     👑 SMART 3D BRAND COLORS - HOVER STATE (ඇත්තම නිල වර්ණ)
      ========================================================== */
 
-  /* Facebook - #1877F2 */
+  /* Facebook */
   .social-icons-3d-expanded a[href*="facebook.com"]:hover {
-    border-color: #1877F2;
-    color: #ffffff;
-    background: linear-gradient(135deg, #2482ff 0%, #1059bd 100%);
-    box-shadow: 0 10px 20px rgba(24, 119, 242, 0.35), inset 0 1px 2px rgba(255, 255, 255, 0.3);
+    border-color: #1877F2 !important;
+    color: #ffffff !important;
+    background: linear-gradient(135deg, #2482ff 0%, #1059bd 100%) !important;
+    box-shadow: 0 12px 24px rgba(24, 119, 242, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.4) !important;
   }
 
-  /* Twitter / X - #1DA1F2 or White/Black (කළු සයිට් එකට ගැළපෙන්න Electric White/Cyan) */
+  /* Twitter / X */
   .social-icons-3d-expanded a[href*="twitter.com"]:hover,
   .social-icons-3d-expanded a[href*="x.com"]:hover {
-    border-color: #f3f4f6;
-    color: #000000;
-    background: linear-gradient(135deg, #ffffff 0%, #e5e7eb 100%);
-    box-shadow: 0 10px 20px rgba(255, 255, 255, 0.25), inset 0 1px 2px rgba(255, 255, 255, 0.5);
+    border-color: #ffffff !important;
+    color: #000000 !important;
+    background: linear-gradient(135deg, #ffffff 0%, #cccccc 100%) !important;
+    box-shadow: 0 12px 24px rgba(255, 255, 255, 0.25), inset 0 1px 2px rgba(255, 255, 255, 0.5) !important;
   }
 
-  /* YouTube - #FF0000 */
+  /* YouTube */
   .social-icons-3d-expanded a[href*="youtube.com"]:hover {
-    border-color: #FF0000;
-    color: #ffffff;
-    background: linear-gradient(135deg, #ff2626 0%, #b30000 100%);
-    box-shadow: 0 10px 20px rgba(255, 0, 0, 0.35), inset 0 1px 2px rgba(255, 255, 255, 0.3);
+    border-color: #FF0000 !important;
+    color: #ffffff !important;
+    background: linear-gradient(135deg, #ff3333 0%, #990000 100%) !important;
+    box-shadow: 0 12px 24px rgba(255, 0, 0, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.3) !important;
   }
 
-  /* WhatsApp - #25D366 */
-  .social-icons-3d-expanded a[href*="whatsapp.com"]:hover {
-    border-color: #25D366;
-    color: #ffffff;
-    background: linear-gradient(135deg, #30e875 0%, #1a9e47 100%);
-    box-shadow: 0 10px 20px rgba(37, 211, 102, 0.35), inset 0 1px 2px rgba(255, 255, 255, 0.3);
+  /* LinkedIn (If exists) */
+  .social-icons-3d-expanded a[href*="linkedin.com"]:hover {
+    border-color: #0077B5 !important;
+    color: #ffffff !important;
+    background: linear-gradient(135deg, #0094ff 0%, #005584 100%) !important;
+    box-shadow: 0 12px 24px rgba(0, 119, 181, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.3) !important;
   }
 
-  /* Telegram - #26A5E4 */
-  .social-icons-3d-expanded a[href*="telegram.org"]:hover,
-  .social-icons-3d-expanded a[href*="t.me"]:hover {
-    border-color: #26A5E4;
-    color: #ffffff;
-    background: linear-gradient(135deg, #33b5f7 0%, #1b7cb0 100%);
-    box-shadow: 0 10px 20px rgba(38, 165, 228, 0.35), inset 0 1px 2px rgba(255, 255, 255, 0.3);
+  /* Instagram */
+  .social-icons-3d-expanded a[href*="instagram.com"]:hover {
+    border-color: #E1306C !important;
+    color: #ffffff !important;
+    background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%) !important;
+    box-shadow: 0 12px 24px rgba(225, 48, 108, 0.35), inset 0 1px 2px rgba(255, 255, 255, 0.3) !important;
   }
 
-  /* Pinterest - #BD081C */
-  .social-icons-3d-expanded a[href*="pinterest.com"]:hover {
-    border-color: #BD081C;
-    color: #ffffff;
-    background: linear-gradient(135deg, #d61126 0%, #8c0512 100%);
-    box-shadow: 0 10px 20px rgba(189, 8, 28, 0.35), inset 0 1px 2px rgba(255, 255, 255, 0.3);
-  }
-
-  /* GitHub - #181717 */
-  .social-icons-3d-expanded a[href*="github.com"]:hover {
-    border-color: #6e5494;
-    color: #ffffff;
-    background: linear-gradient(135deg, #403060 0%, #181717 100%);
-    box-shadow: 0 10px 20px rgba(110, 84, 148, 0.35), inset 0 1px 2px rgba(255, 255, 255, 0.2);
-  }
-
-  /* ⚡ HOVER GLOBAL ACTION */
+  /* ⚡ HOVER POP EFFECT */
   .social-icons-3d-expanded a:hover {
-    transform: translateY(-6px) scale(1.1); /* 3D Pop-up */
+    transform: translateY(-8px) scale(1.12) !important; /* පට්ට 3D Pop එකක් */
   }
   
   .social-icons-3d-expanded a:hover svg {
-    transform: scale(1.15); /* Icon zoom */
-    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));
+    transform: scale(1.15) !important;
   }
 </style>
