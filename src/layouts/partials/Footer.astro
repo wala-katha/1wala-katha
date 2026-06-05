@@ -6,48 +6,106 @@ import social from "@/config/social.json";
 import { markdownify } from "@/lib/utils/textConverter";
 ---
 
-{/* 👑 3D SEAMLESS PREMIUM FOOTER:
-    සයිට් එකේ ප්‍රධාන පසුබිමෙන් කපලා වෙන් නොකර, උඩින් පට්ටම ලස්සන සියුම් 3D Gradient Glow ලයින් එකක් (to-t from-black) දාලා,
-    පහළට යද්දී සියුම් ලෙස වෙනස් වන වෘත්තීය මට්ටමේ අලුත් ස්ටයිල් එකක් දුන්නා */}
-<footer class="relative mt-auto border-t border-gradient-to-r border-t-white/[0.03] bg-gradient-to-b from-[#010203] via-[#05070a] to-[#080b11] py-12 select-none">
-  
-  {/* 3D Depth Top Lighting Layer: ෆුටර් එක පටන් ගන්න තැන සයිට් එක ඇතුළට කිඳා බැහැලා තියෙනවා වගේ 3D ලුක් එකක් දෙන සියුම් සෙවනැල්ල */}
-  <div class="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#01AD9F]/20 to-transparent shadow-[0_-3px_20px_rgba(1,173,159,0.15)]"></div>
+{/* 👑 GLOSSY 3D GLASSMORPHISM FOOTER WRAPPER */}
+<footer 
+  class="relative mt-12 py-12 overflow-hidden border-t border-white/[0.12] bg-gradient-to-b from-white/[0.04] to-white/[0.01] backdrop-blur-xl shadow-[inset_0_2px_4px_rgba(255,255,255,0.15),0_12px_40px_rgba(0,0,0,0.8)]"
+  role="contentinfo"
+>
+  {/* ✨ REAL GLOSSY REFLECTION REFLECTIONS (වීදුරුවක් වගේ දිලිසෙන ඉරි සහ ලයිටින් ඉෆෙක්ට්ස්) */}
+  <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.03] to-white/[0.05] pointer-events-none"></div>
+  <div class="absolute top-0 left-1/4 w-1/2 h-[1px] bg-gradient-to-r from-transparent via-white/40 to-transparent blur-[0.5px]"></div>
 
-  <div class="container relative z-10 text-center">
+  <div class="container relative z-10 text-center select-none">
     
-    {/* 📋 FOOTER NAVIGATION MENU */}
-    <ul class="mb-8 flex flex-wrap justify-center items-center gap-x-2 gap-y-4">
+    {/* 📋 FOOTER MENU */}
+    <ul class="mb-8 flex flex-wrap justify-center gap-x-2 gap-y-3">
       {
-        menu.footer.map((item) => (
+        menu.footer.map((menu) => (
           <li class="inline-block">
             <a
-              href={item.url}
-              /* 🎯 CONTRAST & UI FIX: සාමාන්‍ය වෙලාවට මෘදු සුදු (#F8F8FF/70) දීලා, හොවර් එකේදී සයිට් එකේ තීම් Teal (#01AD9F) වර්ණයෙන් බැබළෙන්න හැදුවා */
-              class="px-4 py-2 text-sm font-medium text-[#F8F8FF]/70 tracking-wide transition-all duration-300 hover:text-[#01AD9F] hover:drop-shadow-[0_0_6px_rgba(1,173,159,0.4)]"
+              href={menu.url}
+              /* SEO CONTRAST FIX: අකුරු වල පැහැදිලි බව text-white/80 කර හොවර් එකේදී තීම් Teal #01AD9F එකට මාරු වීම */
+              class="px-4 py-2 text-sm font-semibold text-white/80 transition-all duration-300 hover:text-[#01AD9F] hover:drop-shadow-[0_0_8px_rgba(1,173,159,0.5)]"
             >
-              {item.name}
+              {menu.name}
             </a>
           </li>
         ))
       }
     </ul>
 
-    {/* 📱 SOCIAL MEDIA ICONS CONTAINER */}
-    {/* සෝෂල් අයිකන මැදට ගෙන ඒම සහ පරතරය නූලට හැදීම */}
-    <div class="flex justify-center mb-8 scale-105">
-      <Social source={social.main} className="social-icons-footer" />
+    {/* 📦 3D BLACK & WHITE MIXED ICON BOX CONTAINER (කොටු ලයින් සහිත 3D අයිකන අවකාශය) */}
+    <div class="footer-social-3d-wrapper mb-8 flex justify-center">
+      <div class="relative p-5 rounded-2xl border border-white/[0.08] bg-black/40 shadow-[inset_0_4px_12px_rgba(0,0,0,0.6),0_1px_1px_rgba(255,255,255,0.05)]">
+        <Social source={social.main} className="social-icons-3d" />
+      </div>
     </div>
 
-    {/* 📑 HORIZONTAL SEPARATOR */}
-    <hr class="border-white/[0.04] max-w-xs mx-auto mb-6" />
-
-    {/* 🔏 COPYRIGHT TEXT */}
-    {/* 🎯 SEO ACCESSIBILITY SCORE: Google Bot එකට නූලටම කියවන්න පුළුවන් වර්ණ අනුපාතයකින් (text-white/50) සකස් කිරීම */}
+    {/* 📜 COPYRIGHT TEXT */}
     <p 
       set:html={markdownify(config.params.copyright)} 
-      class="text-xs sm:text-sm text-[#F8F8FF]/50 font-medium tracking-wider leading-relaxed prose-a:text-[#01AD9F] prose-a:no-underline hover:prose-a:underline" 
+      class="text-xs sm:text-sm text-white/40 font-medium tracking-wide prose-a:text-[#01AD9F] prose-a:no-underline hover:prose-a:underline" 
     />
-
   </div>
 </footer>
+
+{/* 🛠️ 3D AND BOUNDARY LINE CUSTOM STYLING (Astro Global Style injection) */}
+<style is:global>
+  /* 3D කළු සුදු මික්ස් සහ කොටු ලයින් ස්ටයිලින් */
+  .social-icons-3d ul {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  
+  .social-icons-3d li {
+    display: inline-block;
+  }
+  
+  .social-icons-3d a {
+    display: flex;
+    width: 2.75rem;
+    height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.75rem;
+    
+    /* 📦 අයිකනය වටේට තියෙන කොටු ලයින් එක (Border Line) */
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    
+    /* 🖤 3D BLACK & WHITE GRADIENT MIX BACKGROUND (යටින් පෙනෙන කළු-සුදු 3D පසුබිම) */
+    background: linear-gradient(135deg, #18191b 0%, #0d0e10 100%);
+    
+    /* 3D Depth Shadows (කළු පසුබිම මත බොත්තම ඉස්සිලා පේන සෙවනැලි) */
+    box-shadow: 
+      0 4px 6px -1px rgba(0, 0, 0, 0.5), 
+      0 2px 4px -1px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0px rgba(255, 255, 255, 0.12), 
+      inset 0 -2px 4px rgba(0, 0, 0, 0.6);
+      
+    color: #e5e7eb; /* අයිකන් එක පිරිසිදු මෘදු සුදු පැහැය */
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* ⚡ HOVER EFFECT: මවුස් එක උඩට ගියාම 3D එක තව තද වී සයිට් එකේ තීම් Teal පාටින් දිලිසීම */
+  .social-icons-3d a:hover {
+    transform: translateY(-4px) scale(1.05);
+    border-color: #01AD9F;
+    color: #01AD9F;
+    background: linear-gradient(135deg, #242528 0%, #010203 100%);
+    box-shadow: 
+      0 10px 15px -3px rgba(0, 0, 0, 0.7), 
+      0 4px 6px -2px rgba(0, 0, 0, 0.5),
+      0 0 15px rgba(1, 173, 159, 0.4),
+      inset 0 1px 0px rgba(255, 255, 255, 0.2);
+  }
+
+  .social-icons-3d svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    /* SVG එක 3D එකක් වගේ පේන්න පාවිච්චි කරන Drop Shadow එක */
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.8));
+  }
+</style>
