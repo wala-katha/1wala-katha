@@ -6,55 +6,48 @@ import social from "@/config/social.json";
 import { markdownify } from "@/lib/utils/textConverter";
 ---
 
-{/* 👑 PREMIUM 3D METALLIC FOOTER WRAPPER:
-    - පටන් ගන්න තැන (top) 3D විදිහට ඉස්මතු වෙන්න මෘදු සුදු පැහැති සියුම් Edge එකක් (border-t border-white/20) සහ drop-shadow එකක් දුන්නා.
-    - පසුබිම සඳහා දිලිසෙන තද රිදී පැහැයක් එන සේ Metallic Gradient එකක් (from-[#1e2530] via-[#3a4454] to-[#121720]) පාවිච්චි කළා. */}
-<footer 
-  class="relative mt-12 w-full border-t border-white/20 bg-gradient-to-b from-[#1c2330] via-[#2d3748] to-[#0f141c] py-12 shadow-[0_-15px_30px_rgba(0,0,0,0.8),inset_0_1px_2px_rgba(255,255,255,0.15)] select-none rounded-t-[2.5rem]"
-  role="contentinfo"
->
-  {/* 3D Reflection Effect: රිදී පැහැය තවදුරටත් දිලිසෙන්න උඩින්ම දාපු සියුම් ආලෝක පටියක් */}
-  <div class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-white/20 to-transparent blur-[1px]"></div>
+{/* 👑 3D SEAMLESS PREMIUM FOOTER:
+    සයිට් එකේ ප්‍රධාන පසුබිමෙන් කපලා වෙන් නොකර, උඩින් පට්ටම ලස්සන සියුම් 3D Gradient Glow ලයින් එකක් (to-t from-black) දාලා,
+    පහළට යද්දී සියුම් ලෙස වෙනස් වන වෘත්තීය මට්ටමේ අලුත් ස්ටයිල් එකක් දුන්නා */}
+<footer class="relative mt-auto border-t border-gradient-to-r border-t-white/[0.03] bg-gradient-to-b from-[#010203] via-[#05070a] to-[#080b11] py-12 select-none">
+  
+  {/* 3D Depth Top Lighting Layer: ෆුටර් එක පටන් ගන්න තැන සයිට් එක ඇතුළට කිඳා බැහැලා තියෙනවා වගේ 3D ලුක් එකක් දෙන සියුම් සෙවනැල්ල */}
+  <div class="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#01AD9F]/20 to-transparent shadow-[0_-3px_20px_rgba(1,173,159,0.15)]"></div>
 
-  <div class="container mx-auto px-4 text-center">
+  <div class="container relative z-10 text-center">
     
-    {/* 🌐 SEO NAVIGATION MENU */}
-    <nav aria-label="Footer Navigation" class="mb-8">
-      <ul class="flex flex-wrap justify-center items-center gap-x-2 gap-y-4">
-        {
-          menu.footer.map((item) => (
-            <li class="inline-block">
-              <a
-                href={item.url}
-                /* 🎯 CONTRAST FIX: තද රිදී පසුබිම මත අකුරු සුපිරියටම කියවන්න පුළුවන් වෙන්න text-slate-200 දමා, 
-                   හොවර් වීමේදී සයිට් එකේ තීම් Teal (#01AD9F) එකෙන් දිලිසෙන්න හැදුවා */
-                class="px-4 py-2 text-sm font-bold text-slate-200 hover:text-[#01AD9F] transition-all duration-300 hover:drop-shadow-[0_0_8px_rgba(1,173,159,0.6)]"
-              >
-                {item.name}
-              </a>
-            </li>
-          ))
-        }
-      </ul>
-    </nav>
+    {/* 📋 FOOTER NAVIGATION MENU */}
+    <ul class="mb-8 flex flex-wrap justify-center items-center gap-x-2 gap-y-4">
+      {
+        menu.footer.map((item) => (
+          <li class="inline-block">
+            <a
+              href={item.url}
+              /* 🎯 CONTRAST & UI FIX: සාමාන්‍ය වෙලාවට මෘදු සුදු (#F8F8FF/70) දීලා, හොවර් එකේදී සයිට් එකේ තීම් Teal (#01AD9F) වර්ණයෙන් බැබළෙන්න හැදුවා */
+              class="px-4 py-2 text-sm font-medium text-[#F8F8FF]/70 tracking-wide transition-all duration-300 hover:text-[#01AD9F] hover:drop-shadow-[0_0_6px_rgba(1,173,159,0.4)]"
+            >
+              {item.name}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
 
-    {/* 📱 SOCIAL ICONS */}
-    {/* සෝෂල් අයිකන ටික රිදී පසුබිම මත පට්ටම ලස්සනට වෙන් වෙලා පේන්න scale කරලා ගත්තා */}
-    <div class="mb-8 flex justify-center text-slate-100 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
-      <Social source={social.main} className="social-icons scale-110" />
+    {/* 📱 SOCIAL MEDIA ICONS CONTAINER */}
+    {/* සෝෂල් අයිකන මැදට ගෙන ඒම සහ පරතරය නූලට හැදීම */}
+    <div class="flex justify-center mb-8 scale-105">
+      <Social source={social.main} className="social-icons-footer" />
     </div>
 
-    {/* HORIZONTAL SEPARATOR */}
-    <div class="w-24 h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent mx-auto mb-6"></div>
+    {/* 📑 HORIZONTAL SEPARATOR */}
+    <hr class="border-white/[0.04] max-w-xs mx-auto mb-6" />
 
-    {/* 👑 COPYRIGHT TEXT */}
-    {/* සෙවුම් යන්ත්‍ර වලට සහ යූසර්ට පිරිසිදුව පෙනෙන්න text-xs සහ 60% ක් රිදී පැහැයට හැරෙව්වා */}
+    {/* 🔏 COPYRIGHT TEXT */}
+    {/* 🎯 SEO ACCESSIBILITY SCORE: Google Bot එකට නූලටම කියවන්න පුළුවන් වර්ණ අනුපාතයකින් (text-white/50) සකස් කිරීම */}
     <p 
       set:html={markdownify(config.params.copyright)} 
-      class="text-xs sm:text-sm text-slate-400 font-medium tracking-wide drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]" 
+      class="text-xs sm:text-sm text-[#F8F8FF]/50 font-medium tracking-wider leading-relaxed prose-a:text-[#01AD9F] prose-a:no-underline hover:prose-a:underline" 
     />
-  </div>
 
-  {/* 3D Bottom Curve Popup: අවසන් වෙන තැන පට්ටම Clean 3D Finish එකක් දීමට (සයිට් එකේ අන්තිම කෙළවර) */}
-  <div class="absolute bottom-0 left-0 right-0 h-1 bg-[#0f141c] shadow-[inset_0_-2px_4px_rgba(0,0,0,0.9)]"></div>
+  </div>
 </footer>
