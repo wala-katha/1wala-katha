@@ -77,18 +77,18 @@ export default function SearchBar({ searchList }: Props) {
   return (
     <div className="min-h-[50vh] px-2 select-none relative">
       
-      {/* 🎯 SEO & UX FIX: මුල් පිටුවට යාමට සහ සර්ච් එක වසා දැමීමට ඇති ප්‍රිමියම් EXIT CLOSE BUTTON එක */}
+      {/* 🎯 SEO & UX FIX: කෙලින්ම Home යන්නේ නැතිව යූසර් කලින් හිටපු පෝස්ට් එකටම (Back) රැගෙන යන ප්‍රිමියම් EXIT CLOSE BUTTON එක */}
       <div className="max-w-2xl mx-auto flex justify-end mb-4">
-        <a
-          href="/"
-          rel="home"
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.08] text-white/60 hover:text-red-400 transition-all duration-300 text-sm font-semibold tracking-wide shadow-sm"
-          title="Exit search and go home"
-          aria-label="Exit search and go home"
+        <button
+          type="button"
+          onClick={() => history.back()}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.08] text-white/60 hover:text-red-400 transition-all duration-300 text-sm font-semibold tracking-wide shadow-sm cursor-pointer"
+          title="Exit search and go back"
+          aria-label="Exit search and go back"
         >
           <span>Exit</span>
           <IoCloseOutline className="h-5 w-5" />
-        </a>
+        </button>
       </div>
 
       {/* 👑 PREMIUM CAPSULE SEARCH BOX WITH DYNAMIC CLOSE BUTTON */}
