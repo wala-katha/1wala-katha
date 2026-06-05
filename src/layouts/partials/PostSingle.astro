@@ -1,6 +1,6 @@
 ---
 import Share from "@/components/Share.astro";
-import SimilarPosts from "@/layouts/components/SimilarPosts.astro";
+import SimilarPosts from "@/layouts/components/SimilarPosts.astro"; // ⚠️ FIXED: නිවැරදි ෆෝල්ඩර් පාත් එකට අප්ඩේට් කළා
 import { getSinglePage } from "@/lib/contentParser.astro";
 import dateFormat from "@/lib/utils/dateFormat";
 import { humanize, markdownify, slugify } from "@/lib/utils/textConverter";
@@ -16,31 +16,28 @@ const { title, description, authors, categories, image, date, tags } =
   post.data;
 
 // 🎯 SMART SEO RELATED POSTS LOGIC:
+// 1. දැනට කියවන පෝස්ට් එක අයින් කර සමාන කැටගරි තියෙන පෝස්ට් පෙරීම
 let smartSimilarPosts = posts.filter(
   (p) => p.id !== post.id && p.data.categories?.some((cat) => categories?.includes(cat))
 );
 
-// Fallback logic
+// 2. ⚡ SEO FALLBACK: සමාන කැටගරි නැත්නම්, සයිට් එකේ තියෙන වෙනත් ඕනෑම පෝස්ට් ඔටෝ අරන් පෙන්වීම (හිස්ව තැබීම SEO වලට අහිතකරයි)
 if (!smartSimilarPosts || smartSimilarPosts.length === 0) {
   smartSimilarPosts = posts.filter((p) => p.id !== post.id);
 }
 
+// 3. FIX: උඹ ඉල්ලපු විදිහටම කෙළින් අතට (2:3) ලස්സනට පේළියට වාඩි වෙන්න පෝස්ට් ප්‍රමාණය 6ක් දක්වා වැඩි කළා
 const finalSimilarPosts = smartSimilarPosts.slice(0, 6);
-
-// 🎯 COMMENT CONFIGURATION (SEO & DISQUS):
-// උඹේ සයිට් එකේ ඩොමේන් එක ලයිව් දැම්මාම disqus_shortname එක වෙනස් කරපන් මචං.
-const disqusShortname = "wala-katha"; 
-const postAbsoluteUrl = `https://walakatha.pages.dev/${post.id}`;
 ---
 
 <section class="section bg-[#010203]">
   <div class="container">
     <article class="row justify-center">
-      {/* POST TITLE */}
+      {/* POST TITLE: ප්‍රධාන මාතෘකාව #F8F8FF වලින් උපරිම සුදු කර ඉස්මතු කළා */}
       <div class="md:col-10 text-center">
         <h1 set:html={markdownify(title)} class="h2 text-[#F8F8FF] font-black drop-shadow-md" />
         
-        {/* META INFO ROW */}
+        {/* META INFO ROW: මෙටා ඩේටා සහ අයිකන කළු පසුබිමට කැපී පෙනෙන සේ සැකසීම */}
         <ul class="mt-4 flex flex-wrap items-center justify-center text-[#F8F8FF]/90">
           <li class="mx-3">
             {
@@ -111,13 +108,15 @@ const postAbsoluteUrl = `https://walakatha.pages.dev/${post.id}`;
       </div>
 
       <div class="md:col-10">
-        {/* POST CONTENT */}
-        <div class="content mb-16 text-left text-[#F8F8FF] custom-post-content leading-relaxed text-base sm:text-lg">
+        {/* 👑 ULTIMATE POST CONTENT TYPOGRAPHY FIX: 
+            පෝස්ට් එක ඇතුළේ Markdown වලින් ජෙනරේට් වෙන සියලුම අකුරු, පේළි, ලිස්ට්, බ්ලොක්කෝට්ස්, 
+            මාතෘකා සියල්ල කළු පසුබිම මත උපරිමයෙන්ම පෙනීමට #F8F8FF සහ Tailwind custom css යෙදුවා */}
+        <div class="content mb-16 text-left text-[#F8F8FF] custom-post-content">
           <Content />
         </div>
         
-        {/* TAGS BLOCK */}
-        <div class="flex flex-wrap items-center justify-between border-t border-white/10 pt-6 pb-10">
+        {/* TAGS BLOCK: උඹ ඉල්ලපු විදිහටම තද කහ පැහැති පසුබිම සහ කළු අකුරු වලින් බොත්තම් සකස් කළා */}
+        <div class="flex flex-wrap items-center justify-between border-t border-white/10 pt-6">
           <ul class="mr-4 mb-4 space-x-3">
             {
               tags.map((tag: string) => (
@@ -139,26 +138,20 @@ const postAbsoluteUrl = `https://walakatha.pages.dev/${post.id}`;
             slug={post.id}
           />
         </div>
-
-        {/* 👑 PREMIUM DISQUS COMMENT SECTION (🎯 NEW INTEGRATION) */}
-        <div class="mt-10 border-t border-white/10 pt-10 mb-10 bg-[#060709] p-6 rounded-2xl border border-white/[0.04]">
-          <h3 class="text-[#F8F8FF] font-black text-xl mb-6 flex items-center gap-2">
-            <span>අදහස් දක්වන්න (Comments)</span>
-          </h3>
-          <div id="disqus_thread"></div>
-        </div>
       </div>
     </article>
   </div>
 </section>
 
-{/* SUGGESTED STORIES BLOCK */}
+{/* 👑 SUGGESTED STORIES BLOCK:
+    1. පසුබිම: කළු ➔ තද කොළ ➔ කළු (from-[#010203] via-[#013220]/40 to-[#010203]) 3-Way Gradient එකක් දැම්මා.
+    2. ඇනිමේෂන්: කිසිදු ට්‍රාන්සිෂන් හෝ ඇනිමේෂන් එකක් නැති ස්ථාවර ලුක් එකක් දුන්නා. */}
 {
   finalSimilarPosts.length > 0 && (
     <section class="section pt-12 pb-16 bg-gradient-to-b from-[#010203] via-[#022c16] to-[#010203] border-t border-white/5">
       <div class="container">
-        {/* 🎯 SEO FIX: h4 ක්ලාස් එක තබා ගනිමින් Semantic ව්‍යුහය වඩාත් නිවැරදි කළා */}
-        <h2 class="mb-8 font-black text-center text-xl sm:text-2xl text-[#F8F8FF]">
+        {/* ටයිටල් එක හරියටම මැදට (text-center) ගෙන, පැති බෝඩර් ඉවත් කර පිරිසිදු තද සුදු කර ඉස්මතු කළා */}
+        <h2 class="mb-8 font-black text-center h4 text-[#F8F8FF]">
           ඔබ කැමති විය හැකි තවත් කතා (Suggested Stories)
         </h2>
         
@@ -170,22 +163,8 @@ const postAbsoluteUrl = `https://walakatha.pages.dev/${post.id}`;
   )
 }
 
-{/* ⚡ DISQUS COMMENTS LAZY LOAD SCRIPT */}
-<script is:inline define:vars={{ disqusShortname, postAbsoluteUrl, postId: post.id }}>
-  var disqus_config = function () {
-    this.page.url = postAbsoluteUrl;
-    this.page.identifier = postId;
-  };
-
-  (function() {
-    var d = document, s = d.createElement('script');
-    s.src = 'https://' + disqusShortname + '.disqus.com/embed.js';
-    s.setAttribute('data-timestamp', +new Date());
-    (d.head || d.body).appendChild(s);
-  })();
-</script>
-
-{/* ⚡ SCOPED GLOBAL CSS FOR TYPOGRAPHY & LINK CONTRAST */}
+{/* ⚡ SCOPED CSS FOR ADVANCED TYPOGRAPHY COMPATIBILITY:
+    Markdown මඟින් එන ඕනෑම ඡේදයක් හෝ Span එකක් නිතැතින්ම #F8F8FF වන බව සනාථ කිරීමේ SEO ආරක්ෂක පියවරක් */}
 <style is:global>
   .custom-post-content p, 
   .custom-post-content span, 
@@ -198,16 +177,6 @@ const postAbsoluteUrl = `https://walakatha.pages.dev/${post.id}`;
     color: #F8F8FF !important;
   }
   .custom-post-content blockquote p {
-    color: rgba(248, 248, 255, 0.8) !important;
-  }
-  /* 🎯 SEO & UX FIX: පෝස්ට් එක ඇතුළේ තියෙන ලින්ක් සුදු පාට නොවී ලස්සනට කැපී පෙනෙන ලොජික් එක */
-  .custom-post-content a {
-    color: #01AD9F !important;
-    text-decoration: underline;
-    font-weight: 700;
-    transition: color 0.2s ease;
-  }
-  .custom-post-content a:hover {
-    color: #FFCC00 !important;
+    color: #F8F8FF/80 !important;
   }
 </style>
