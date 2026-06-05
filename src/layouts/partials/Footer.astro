@@ -6,26 +6,44 @@ import social from "@/config/social.json";
 import { markdownify } from "@/lib/utils/textConverter";
 ---
 
-<footer class="section bg-dark">
-  <div class="container text-center">
-    {/* footer menu */}
-    <ul class="mb-8 space-x-4">
+{/* 👑 PREMIUM DARK FOOTER: 
+    සයිට් එකේ ප්‍රධාන පසුබිම වන Rich Black (#010203) එකම දීලා, ඉහළින් සියුම් බෝඩර් ලයින් (border-t) එකක් දැම්මා */}
+<footer class="bg-[#010203] border-t border-white/[0.05] py-12 select-none">
+  <div class="container mx-auto px-4 text-center">
+    
+    {/* 🔗 FOOTER MENU LINX */}
+    <ul class="mb-8 flex flex-wrap justify-center items-center gap-x-2 gap-y-4 sm:gap-x-6">
       {
-        menu.footer.map((menu) => (
+        menu.footer.map((menuItem) => (
           <li class="inline-block">
             <a
-              href={menu.url}
-              class="p-4 text-white/75 hover:text-white transition-all"
+              href={menuItem.url}
+              /* 🎯 CONTRAST & UI FIX: සාමාන්‍ය වෙලාවට text-white/60 (කියවන්න ලෙහෙසි මෘදු සුදු) දීලා, 
+                 හොවර් එකේදී සයිට් එකේ ප්‍රධාන Teal (#01AD9F) වර්ණයෙන් බැබළෙන්න හැදුවා */
+              class="text-sm font-medium text-white/60 hover:text-[#01AD9F] transition-all duration-300 px-3 py-2 rounded-md hover:bg-white/[0.02]"
             >
-              {menu.name}
+              {menuItem.name}
             </a>
           </li>
         ))
       }
     </ul>
-    {/* social icons */}
-    <Social source={social.main} className="social-icons mb-8" />
-    {/* copyright */}
-    <p set:html={markdownify(config.params.copyright)} class="text-white/75" />
+
+    {/* 📱 SOCIAL ICONS */}
+    {/* අපි කලින් හදපු පිරිසිදු සෝෂල් කම්පෝනන්ට් එක මෙතැනදී මැදට ලස්සනට ඇලයින් කළා */}
+    <div class="flex justify-center mb-8">
+      <Social source={social.main} className="social-icons scale-105" />
+    </div>
+
+    {/* 👑 HORIZONTAL SEPARATOR */}
+    <hr class="border-white/[0.05] max-w-xs mx-auto mb-6" />
+
+    {/* 📝 COPYRIGHT TEXT */}
+    {/* Google Bot එකට සයිට් එකේ අයිතිය නීතිමය වශයෙන් කියවන්න ලෙහෙසි වෙන්න text-white/40 කරලා text-xs දැම්මා */}
+    <p 
+      set:html={markdownify(config.params.copyright)} 
+      class="text-xs sm:text-sm text-white/40 tracking-wide font-medium" 
+    />
+    
   </div>
 </footer>
