@@ -32,28 +32,50 @@ const authorSchema = {
 
 <script type="application/ld+json" set:html={JSON.stringify(authorSchema)} />
 
-<section class="section">
+<section class="section py-16 select-none">
   <div class="container">
-    <div class="mb-4 text-center md:px-24">
+    {/* 👑 PREMIUM PROFILE CARD: මුළු කර්තෘ කොටසම කළු පසුබිම මත පට්ටම ලස්සනට වෙන් වී පෙනීමට සියුම් බොක්ස් එකක් හැදුවා */}
+    <div class="max-w-3xl mx-auto border border-white/[0.04] bg-white/[0.01] p-8 sm:p-12 rounded-3xl backdrop-blur-sm text-center shadow-2xl">
+      
+      {/* AUTHOR IMAGE WITH NEON GLOW */}
       {
         image && (
-          <div class="mb-8">
+          <div class="mb-6 relative inline-block">
+            {/* 🎯 UI HIGHLIGHT: පින්තූරය වටේට සයිට් එකේ තීම් Teal (#01AD9F) වර්ණයෙන් රවුම් බෝඩරයක් සහ මෘදු Glow එකක් දුන්නා */}
+            <div class="absolute inset-0 rounded-full bg-[#01AD9F]/20 blur-md transform scale-105"></div>
             <Image
               src={image}
-              class="mx-auto rounded-lg"
-              height={150}
-              width={150}
+              class="relative mx-auto rounded-full border-2 border-[#01AD9F] object-cover shadow-xl transition duration-300 hover:scale-105"
+              height={130}
+              width={130}
               alt={title}
+              loading="eager"
             />
           </div>
         )
       }
-      <h1 set:html={markdownify(title)} class="page-heading h2 mb-8" />
 
-      <Social source={social} className="social-icons-simple" />
-      <div class="content">
+      {/* AUTHOR NAME */}
+      {/* 👑 CONTRAST FIX: නම කළු පසුබිම මත උපරිමයෙන් කැපී පෙනෙන්න text-[#F8F8FF] (පිරිසිදු සුදු) සහ font-black කළා */}
+      <h1 
+        set:html={markdownify(title)} 
+        class="text-2xl sm:text-4xl font-black tracking-tight text-[#F8F8FF] mb-4 drop-shadow-sm" 
+      />
+
+      {/* SOCIAL LINKS CONTAINER */}
+      <div class="flex justify-center mb-8">
+        <Social source={social} className="social-icons-simple scale-110" />
+      </div>
+
+      {/* HORIZONTAL SEPARATOR */}
+      <hr class="border-white/10 max-w-xs mx-auto mb-8" />
+
+      {/* AUTHOR BIOGRAPHY (CONTENT) */}
+      {/* 🎯 SEO CONTRAST & READABILITY: ඇතුළේ තියෙන පparagraphs වල අකුරු මෘදු සුදු (text-white/70) කර කියවීමේ පහසුව 100%ක් කළා */}
+      <div class="content text-[#F8F8FF]/80 text-sm sm:text-base leading-relaxed max-w-xl mx-auto prose prose-invert">
         <Content />
       </div>
+
     </div>
   </div>
 </section>
