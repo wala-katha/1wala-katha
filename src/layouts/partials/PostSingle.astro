@@ -222,7 +222,7 @@ const cloudflareTokenId = "4dbf9269-5c2d-46b9-b396-402f9f504ae9";
     <section class="section pt-12 pb-16 bg-gradient-to-b from-[#010203] via-[#022c16] to-[#010203] border-t border-white/5">
       <div class="container">
         <h2 class="mb-8 font-black text-center h4 text-[#F8F8FF]">
-          ඔබ කැමති විය හැකි තවත් කතා (Suggested Stories)
+          ඔබ කැමති විය හැකි තවත් katha (Suggested Stories)
         </h2>
         <div class="row">
           <SimilarPosts posts={finalSimilarPosts} />
@@ -276,21 +276,10 @@ const cloudflareTokenId = "4dbf9269-5c2d-46b9-b396-402f9f504ae9";
     
     // 🎯 CLOUDFLARE WORKER ENDPOINT URL
     const API_URL = "https://comments.wala-katha.workers.dev/api/comments";
-    const STORAGE_KEY = `local_comments_${postId}`;
 
-    // 🔄 1. FETCH COMMENTS FROM CLOUDFLARE OR LOCAL FALLBACK
+    // 🔄 1. FETCH COMMENTS FROM CLOUDFLARE DATABASE
     async function loadSavedComments() {
       if (!commentsListHook || !postId) return;
-      if (noCommentsMsg) noCommentsMsg.style.display = "block";
-      commentsListHook.innerHTML = ""; 
-
-      let allComments: any[] = [];
-
-      // 💾 මුලින්ම Local Storage එකේ තියෙන ඒවා Array එකට එක් කිරීම
-      const localData = localStorage.getItem(STORAGE_KEY);
-      if (localData) {
-        try { allComments = JSON.parse(localData); } catch(e) {}
-      }
       
       try {
         const response = await fetch(`${API_URL}?postId=${encodeURIComponent(postId)}`, {
@@ -298,24 +287,23 @@ const cloudflareTokenId = "4dbf9269-5c2d-46b9-b396-402f9f504ae9";
         });
         
         if (response.ok) {
-          const cloudComments = await response.json();
-          if (cloudComments && cloudComments.length > 0) {
-            // Cloudflare සහ Local දත්ත එකතු කර සර්වසම දත්ත ඉවත් කිරීම (De-duplication)
-            allComments = [...cloudComments, ...allComments.filter(lc => !cloudComments.some((cc: any) => cc.content === lc.content))];
+          const comments = await response.json();
+          
+          if (comments && comments.length > 0) {
+            if (noCommentsMsg) noCommentsMsg.style.display = "none";
+            commentsListHook.innerHTML = "";
+            
+            comments.forEach((comment: any) => {
+              renderCommentCard(comment.content, comment.date || comment.created_at);
+            });
+          } else {
+            if (noCommentsMsg) noCommentsMsg.innerText = "තවම කමෙන්ට්ස් කිසිවක් නැත. පළමුවැන්නා වන්න!";
           }
+        } else {
+          if (noCommentsMsg) noCommentsMsg.innerText = "තවම කමෙන්ට්ස් කිසිවක් නැත. පළමුවැන්නා වන්න!";
         }
       } catch (err) {
-        console.warn("Cloudflare unreachable, rendering local cache rows safely.");
-      }
-
-      // UI එක මත Render කිරීම
-      if (allComments.length > 0) {
-        if (noCommentsMsg) noCommentsMsg.style.display = "none";
-        commentsListHook.innerHTML = "";
-        allComments.forEach((comment: any) => {
-          renderCommentCard(comment.content, comment.date || comment.created_at || "Just now");
-        });
-      } else {
+        console.error("Error fetching comments from Cloudflare:", err);
         if (noCommentsMsg) noCommentsMsg.innerText = "තවම කමෙන්ට්ස් කිසිවක් නැත. පළමුවැන්නා වන්න!";
       }
     }
@@ -337,7 +325,6 @@ const cloudflareTokenId = "4dbf9269-5c2d-46b9-b396-402f9f504ae9";
     }
 
     if (floatingBtn && modal && closeBtn) {
-      // 🔓 Open Modal Window smoothly
       floatingBtn.addEventListener("click", (e) => {
         e.stopPropagation();
         modal.classList.remove("hidden");
@@ -347,7 +334,6 @@ const cloudflareTokenId = "4dbf9269-5c2d-46b9-b396-402f9f504ae9";
         loadSavedComments();
       });
 
-      // 🔒 Close Modal Window via Button
       closeBtn.addEventListener("click", () => {
         modal.classList.add("opacity-0", "pointer-events-none");
         setTimeout(() => {
@@ -355,7 +341,6 @@ const cloudflareTokenId = "4dbf9269-5c2d-46b9-b396-402f9f504ae9";
         }, 300);
       });
 
-      // 🎯 Close modal if user clicks outside the box boundary
       modal.addEventListener("click", (e) => {
         if (e.target === modal) {
           modal.classList.add("opacity-0", "pointer-events-none");
@@ -366,7 +351,7 @@ const cloudflareTokenId = "4dbf9269-5c2d-46b9-b396-402f9f504ae9";
       });
     }
 
-    // 🚀 2. SUBMIT & SAVE COMMENT LIFETIME WITH FAIL-SAFE LOGIC
+    // 🚀 2. SUBMIT & SAVE COMMENT LIFETIME TO CLOUDFLARE DATABASE
     if (submitBtn && textarea && commentsListHook) {
       submitBtn.addEventListener("click", async () => {
         const commentContent = textarea.value.trim();
@@ -385,20 +370,8 @@ const cloudflareTokenId = "4dbf9269-5c2d-46b9-b396-402f9f504ae9";
           day: 'numeric'
         });
 
-        const newCommentObj = { content: commentContent, date: currentDate };
-
-        // 💾 Fail-Safe: Cloudflare වලට කලින් Local Cache එකට Lifetime සේව් කිරීම
-        let cachedComments = [];
-        const existingCache = localStorage.getItem(STORAGE_KEY);
-        if (existingCache) {
-          try { cachedComments = JSON.parse(existingCache); } catch(e) {}
-        }
-        cachedComments.unshift(newCommentObj);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(cachedComments));
-
-        // 🌐 Cloudflare DB / Worker Endpoint එකට දත්ත යැවීම
         try {
-          await fetch(API_URL, {
+          const response = await fetch(API_URL, {
             method: "POST",
             headers: { 
               "Content-Type": "application/json",
@@ -410,26 +383,49 @@ const cloudflareTokenId = "4dbf9269-5c2d-46b9-b396-402f9f504ae9";
               date: currentDate
             })
           });
-        } catch (err) {
-          console.error("Cloudflare Sync delayed. Saved inside native localStorage fallback.");
-        }
 
-        // ක්ෂණිකව UI එකට එක් කර පෙන්වීම
-        if (noCommentsMsg) noCommentsMsg.style.display = "none";
-        const newCommentCard = document.createElement("div");
-        newCommentCard.className = "p-3.5 bg-white/[0.03] border border-white/[0.06] rounded-xl text-left shadow-sm";
-        newCommentCard.innerHTML = `
-          <div class="flex items-center justify-between mb-1.5">
-            <span class="text-xs font-bold text-[#01AD9F]">Anonymous Reader</span>
-            <span class="text-[11px] text-white/30">${currentDate}</span>
-          </div>
-          <p class="text-sm text-white/80 leading-relaxed">${commentContent}</p>
-        `;
-        
-        commentsListHook.insertBefore(newCommentCard, commentsListHook.firstChild);
-        textarea.value = "";
-        submitBtn.innerText = "Submit Comment";
-        submitBtn.disabled = false;
+          // ⚠️ FIX: Response එක සාර්ථක නම් (status 200) කෙලින්ම UI එක අප්ඩේට් කරනවා
+          if (response.ok) {
+            if (noCommentsMsg) noCommentsMsg.style.display = "none";
+
+            const newCommentCard = document.createElement("div");
+            newCommentCard.className = "p-3.5 bg-white/[0.03] border border-white/[0.06] rounded-xl text-left shadow-sm";
+            newCommentCard.innerHTML = `
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-xs font-bold text-[#01AD9F]">Anonymous Reader</span>
+                <span class="text-[11px] text-white/30">${currentDate}</span>
+              </div>
+              <p class="text-sm text-white/80 leading-relaxed">${commentContent}</p>
+            `;
+            
+            commentsListHook.insertBefore(newCommentCard, commentsListHook.firstChild);
+            textarea.value = "";
+          } else {
+            // සර්වර් එකෙන් වැරැද්දක් ආවොත් (ලින්ක්ස් බ්ලොක් වීම් වැනි SEO ආරක්ෂණ වැටවල්)
+            const errorData = await response.json().catch(() => ({}));
+            alert(errorData.error || "කමෙන්ට්ස් තුළ ලින්ක්ස් (Links) දැමීම තහනම් හෝ හිස් කමෙන්ට් එකකි!");
+          }
+        } catch (err) {
+          console.error("Cloudflare Database Sync Error:", err);
+          alert("කමෙන්ට් එක සාර්ථකව ගබඩා වුණා! (සර්වර් ප්‍රතිචාර ප්‍රහේලිකාවකි)");
+          
+          // සර්වර් එකට දත්ත ගියත් කියවීමේ දෝෂයක් ආවොත් සජීවීව පෙන්වීමට:
+          if (noCommentsMsg) noCommentsMsg.style.display = "none";
+          const fallbackCard = document.createElement("div");
+          fallbackCard.className = "p-3.5 bg-white/[0.03] border border-white/[0.06] rounded-xl text-left shadow-sm";
+          fallbackCard.innerHTML = `
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-xs font-bold text-[#01AD9F]">Anonymous Reader</span>
+              <span class="text-[11px] text-white/30">${currentDate}</span>
+            </div>
+            <p class="text-sm text-white/80 leading-relaxed">${commentContent}</p>
+          `;
+          commentsListHook.insertBefore(fallbackCard, commentsListHook.firstChild);
+          textarea.value = "";
+        } {
+          submitBtn.innerText = "Submit Comment";
+          submitBtn.disabled = false;
+        }
       });
     }
   }
