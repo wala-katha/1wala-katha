@@ -207,7 +207,7 @@ const cloudflareTokenId = "4dbf9269-5c2d-46b9-b396-402f9f504ae9";
           <div class="border-t border-white/5 pt-4 text-left">
             <p class="text-xs text-white/40 tracking-wider uppercase mb-3 font-semibold">Recent Comments</p>
             <div id="comments-list-hook" class="space-y-3">
-              <p id="no-comments-msg" class="text-sm text-white/50 italic py-2 text-center">තවම කමෙන්ට්ස් කිසිවක් නැත. පළමුවැන්නා වන්න!</p>
+              <p id="no-comments-msg" class="text-sm text-white/50 italic py-2 text-center">කමෙන්ට්ස් ලෝඩ් වෙමින් පවතී...</p>
             </div>
           </div>
         </div>
@@ -269,44 +269,60 @@ const cloudflareTokenId = "4dbf9269-5c2d-46b9-b396-402f9f504ae9";
     const textarea = document.getElementById("cf-comment-text") as HTMLTextAreaElement;
     const commentsListHook = document.getElementById("comments-list-hook");
     const noCommentsMsg = document.getElementById("no-comments-msg");
-    
-    // 👑 මෙම පෝස්ට් එකට අදාළ Unique LocalStorage Key එක ලබා ගැනීම
     const container = document.getElementById("cloudflare-comment-container");
-    const postId = container?.getAttribute("data-post-id") || "default";
-    const storageKey = `comments_store_${postId}`;
 
-    // 🔄 FUNCTION: කමෙන්ට් එකක් සඳහා HTML නිපදවීම
-    function createCommentCardHTML(content: string, dateStr: string) {
-      return `
-        <div class="p-3.5 bg-white/[0.03] border border-white/[0.06] rounded-xl text-left shadow-sm">
-          <div class="flex items-center justify-between mb-1.5">
-            <span class="text-xs font-bold text-[#01AD9F]">Anonymous Reader</span>
-            <span class="text-[11px] text-white/30">${dateStr}</span>
-          </div>
-          <p class="text-sm text-white/80 leading-relaxed">${content}</p>
-        </div>
-      `;
-    }
+    const cfToken = container?.getAttribute("data-cf-token");
+    const postId = container?.getAttribute("data-post-id");
+    
+    // 🎯 CLOUDFLARE WORKER ENDPOINT URL (උඹේම Cloudflare Worker එකේ සජීවී URL එක)
+    const API_URL = "https://comments.wala-katha.workers.dev/api/comments";
 
-    // 💾 FUNCTION: පිටුව ලෝඩ් වන විට සේව් කර ඇති පැරණි කමෙන්ට්ස් පෙන්වීම
-    function loadSavedComments() {
-      if (!commentsListHook) return;
+    // 🔄 1. FETCH COMMENTS FROM CLOUDFLARE DATABASE (පිටුවට ආපු ගමන් පරණ කමෙන්ට්ස් ඩේටාබේස් එකෙන් කියවීම)
+    async function loadSavedComments() {
+      if (!commentsListHook || !postId) return;
       
-      const savedComments = JSON.parse(localStorage.getItem(storageKey) || "[]");
-      
-      if (savedComments.length > 0) {
-        if (noCommentsMsg) noCommentsMsg.style.display = "none";
+      try {
+        const response = await fetch(`${API_URL}?postId=${encodeURIComponent(postId)}`, {
+          headers: { "Authorization": `Bearer ${cfToken}` }
+        });
         
-        commentsListHook.innerHTML = savedComments
-          .map((c: { content: string; date: string }) => createCommentCardHTML(c.content, c.date))
-          .join("");
-      } else {
-        if (noCommentsMsg) noCommentsMsg.style.display = "block";
+        if (response.ok) {
+          const comments = await response.json();
+          
+          if (comments && comments.length > 0) {
+            if (noCommentsMsg) noCommentsMsg.style.display = "none";
+            commentsListHook.innerHTML = ""; // ලෝඩින් මැසේජ් එක ක්ලියර් කිරීම
+            
+            comments.forEach((comment: any) => {
+              renderCommentCard(comment.content, comment.date || comment.created_at);
+            });
+          } else {
+            if (noCommentsMsg) noCommentsMsg.innerText = "තවම කමෙන්ට්ස් කිසිවක් නැත. පළමුවැන්නා වන්න!";
+          }
+        } else {
+          if (noCommentsMsg) noCommentsMsg.innerText = "තවම කමෙන්ට්ස් කිසිවක් නැත. පළමුවැන්නා වන්න!";
+        }
+      } catch (err) {
+        console.error("Error fetching comments from Cloudflare:", err);
+        if (noCommentsMsg) noCommentsMsg.innerText = "තවම කමෙන්ට්ස් කිසිවක් නැත. පළමුවැන්නා වන්න!";
       }
     }
 
-    // මුලින්ම කමෙන්ට්ස් ලෝඩ් කිරීම
-    loadSavedComments();
+    // 🎨 UI CARD RENDER FUNCTION
+    function renderCommentCard(content: string, dateStr: string) {
+      if (!commentsListHook) return;
+      const card = document.createElement("div");
+      card.className = "p-3.5 bg-white/[0.03] border border-white/[0.06] rounded-xl text-left shadow-sm animate-fade-in";
+      
+      card.innerHTML = `
+        <div class="flex items-center justify-between mb-1.5">
+          <span class="text-xs font-bold text-[#01AD9F]">Anonymous Reader</span>
+          <span class="text-[11px] text-white/30">${dateStr}</span>
+        </div>
+        <p class="text-sm text-white/80 leading-relaxed">${content}</p>
+      `;
+      commentsListHook.appendChild(card); // පරණ ඒවා පිළිවෙලට පෙන්වීම
+    }
 
     if (floatingBtn && modal && closeBtn) {
       // 🔓 Open Modal Window smoothly
@@ -316,6 +332,7 @@ const cloudflareTokenId = "4dbf9269-5c2d-46b9-b396-402f9f504ae9";
         setTimeout(() => {
           modal.classList.remove("opacity-0", "pointer-events-none");
         }, 10);
+        loadSavedComments(); // පොපප් එක ඇරෙද්දීම කමෙන්ට්ස් ලෝඩ් කිරීම (SEO / Performance වලට සුපිරි)
       });
 
       // 🔒 Close Modal Window via Button
@@ -337,7 +354,7 @@ const cloudflareTokenId = "4dbf9269-5c2d-46b9-b396-402f9f504ae9";
       });
     }
 
-    // 🎯 FIX: SUBMIT INTERACTION & COLD STORAGE SYNC LOGIC
+    // 🚀 2. SUBMIT & SAVE COMMENT LIFETIME TO CLOUDFLARE DATABASE
     if (submitBtn && textarea && commentsListHook) {
       submitBtn.addEventListener("click", async () => {
         const commentContent = textarea.value.trim();
@@ -347,9 +364,8 @@ const cloudflareTokenId = "4dbf9269-5c2d-46b9-b396-402f9f504ae9";
           return;
         }
 
-        if (noCommentsMsg) {
-          noCommentsMsg.style.display = "none";
-        }
+        submitBtn.innerText = "Submitting...";
+        submitBtn.disabled = true;
 
         const currentDate = new Date().toLocaleDateString('en-US', {
           year: 'numeric',
@@ -357,33 +373,50 @@ const cloudflareTokenId = "4dbf9269-5c2d-46b9-b396-402f9f504ae9";
           day: 'numeric'
         });
 
-        // 👑 1. බ්‍රවුසර් එකේ UI එකට සජීවීව ඇතුළත් කිරීම
-        const newCommentCard = document.createElement("div");
-        newCommentCard.className = "p-3.5 bg-white/[0.03] border border-white/[0.06] rounded-xl text-left shadow-sm";
-        newCommentCard.innerHTML = createCommentCardHTML(commentContent, currentDate);
-        commentsListHook.insertBefore(newCommentCard, commentsListHook.firstChild);
-
-        // 👑 2. PERSISTENT STORAGE: LocalStorage එකට ස්ථිරව සේව් කිරීම (හරිම වැදගත් කැබැල්ල)
-        const currentSaved = JSON.parse(localStorage.getItem(storageKey) || "[]");
-        currentSaved.unshift({ content: commentContent, date: currentDate }); // අලුත්ම එක උඩට දමයි
-        localStorage.setItem(storageKey, JSON.stringify(currentSaved));
-        
-        // Input එක ක්ලියර් කිරීම
-        textarea.value = "";
-
-        // 🌐 Cloudflare API / Worker Endpoint එකක් තිබේ නම් Fetch Request එක මෙතැනින් යැවිය හැක:
-        /*
-        const token = container?.getAttribute("data-cf-token");
+        // 🌐 Cloudflare API / Worker Endpoint එකට දත්ත සේව් කිරීමට යැවීම
         try {
-          await fetch("https://your-cloudflare-worker-url.workers.dev/api/comments", {
+          const response = await fetch(API_URL, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ token, postId, content: commentContent })
+            headers: { 
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${cfToken}`
+            },
+            body: JSON.stringify({ 
+              postId: postId, 
+              content: commentContent,
+              date: currentDate
+            })
           });
+
+          const resultData = await response.json();
+
+          if (response.ok && resultData.success) {
+            if (noCommentsMsg) noCommentsMsg.style.display = "none";
+
+            // ප්‍රිමියම් ඩාර්ක් කාඩ් එකක් සාදා සජීවීව ලිස්ට් එකේ ඉහළටම ඇතුළත් කිරීම
+            const newCommentCard = document.createElement("div");
+            newCommentCard.className = "p-3.5 bg-white/[0.03] border border-white/[0.06] rounded-xl text-left shadow-sm";
+            newCommentCard.innerHTML = `
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-xs font-bold text-[#01AD9F]">Anonymous Reader</span>
+                <span class="text-[11px] text-white/30">${currentDate}</span>
+              </div>
+              <p class="text-sm text-white/80 leading-relaxed">${commentContent}</p>
+            `;
+            
+            commentsListHook.insertBefore(newCommentCard, commentsListHook.firstChild);
+            textarea.value = "";
+          } else {
+            // Worker එකෙන් එවන සිරස්ස ආරක්ෂක වැටවල් වල වැරදි පෙන්වීම (හිස් ඒවා, ලින්ක්ස්, දිග වැඩි ඒවා)
+            alert(resultData.error || "කමෙන්ට් එක සේව් කිරීමට නොහැකි වුණා. කරුණාකර නැවත උත්සාහ කරන්න.");
+          }
         } catch (err) {
-          console.error("Cloudflare Worker sync error:", err);
+          console.error("Cloudflare Database Sync Error:", err);
+          alert("Cloudflare සර්වර් සම්බන්ධතා දෝෂයක්! කමෙන්ට් එක ගබඩා වුණේ නැත.");
+        } finally {
+          submitBtn.innerText = "Submit Comment";
+          submitBtn.disabled = false;
         }
-        */
       });
     }
   }
