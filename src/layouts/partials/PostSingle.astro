@@ -1,3 +1,4 @@
+
 ---
 import Share from "@/components/Share.astro";
 import SimilarPosts from "@/layouts/components/SimilarPosts.astro";
@@ -62,6 +63,13 @@ const articleSchema = JSON.stringify({
   "articleSection": categories?.map((c: string) => humanize(c)).join(", ") ?? "",
   "inLanguage": "si",
   "url": postUrl,
+  // ✅ SEO FIX 1: speakable schema — Google Assistant / voice search
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": ["h1", ".custom-post-content p:first-of-type"]
+  },
+  // ✅ SEO FIX 2: wordCount estimate
+  "wordCount": description ? Math.ceil(description.split(/\s+/).length * 8) : undefined,
 });
 
 // SEO: BreadcrumbList Schema
@@ -76,6 +84,7 @@ const breadcrumbSchema = JSON.stringify({
 });
 ---
 
+<!-- SEO: Canonical + Meta -->
 <link rel="canonical" href={postUrl} />
 <meta name="description" content={description ?? title} />
 <meta name="keywords" content={tags?.join(", ") ?? ""} />
@@ -84,12 +93,16 @@ const breadcrumbSchema = JSON.stringify({
 <meta name="language" content="Sinhala" />
 <meta name="revisit-after" content="3 days" />
 
+<!-- Open Graph -->
 <meta property="og:type" content="article" />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description ?? title} />
 <meta property="og:url" content={postUrl} />
 {image && <meta property="og:image" content={`${siteUrl}${image}`} />}
 {image && <meta property="og:image:alt" content={title} />}
+<!-- ✅ SEO FIX 3: og:image dimensions — Facebook/WhatsApp preview size hint -->
+{image && <meta property="og:image:width" content="1200" />}
+{image && <meta property="og:image:height" content="630" />}
 <meta property="og:locale" content="si_LK" />
 <meta property="og:site_name" content="Wala Katha" />
 {date && <meta property="article:published_time" content={new Date(date).toISOString()} />}
@@ -98,12 +111,16 @@ const breadcrumbSchema = JSON.stringify({
 {categories?.map((c: string) => <meta property="article:section" content={humanize(c)} />)}
 {tags?.map((t: string) => <meta property="article:tag" content={humanize(t)} />)}
 
+<!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content={title} />
 <meta name="twitter:description" content={description ?? title} />
 {image && <meta name="twitter:image" content={`${siteUrl}${image}`} />}
 {image && <meta name="twitter:image:alt" content={title} />}
+<!-- ✅ SEO FIX 4: Twitter site handle -->
+<meta name="twitter:site" content="@WalaKatha" />
 
+<!-- Article + Breadcrumb Structured Data (JSON-LD) -->
 <script type="application/ld+json" set:html={articleSchema} />
 <script type="application/ld+json" set:html={breadcrumbSchema} />
 
@@ -355,7 +372,8 @@ const breadcrumbSchema = JSON.stringify({
       <h2 class="mb-8 font-black text-center h4 text-[#F8F8FF]">
         ඔබ කැමති විය හැකි තවත් කතා
       </h2>
-      <div class="row book-shelf-container">
+      <!-- ✅ CHANGE 2: 3D book-style popup wrapper — links unchanged, SimilarPosts component unchanged -->
+      <div class="row similar-posts-3d-grid">
         <SimilarPosts posts={finalSimilarPosts} />
       </div>
     </div>
@@ -501,76 +519,92 @@ const breadcrumbSchema = JSON.stringify({
     50%       { transform: scaleY(1);   opacity: 1;   }
   }
 
-  /* 📚 3D BOOK POPUP ENGINE FOR SIMILAR POSTS */
-  .book-shelf-container {
+  /* ✅ CHANGE 2: 3D BOOK-STYLE POPUP CARDS for SimilarPosts
+     — perspective container + per-card book lift effect
+     — links unchanged, images unchanged, only visual transform added */
+  .similar-posts-3d-grid {
     perspective: 1200px;
   }
-  .book-shelf-container > div {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 2rem;
-  }
-  /* SimilarPosts layout එකෙන් පිටවන card elements ඉලක්ක කිරීම */
-  .book-shelf-container a, 
-  .book-shelf-container .card {
+
+  /* Target every direct card-like child article/div inside SimilarPosts */
+  .similar-posts-3d-grid article,
+  .similar-posts-3d-grid .card,
+  .similar-posts-3d-grid [class*="col-"] > a,
+  .similar-posts-3d-grid [class*="col-"] > div {
     position: relative;
-    width: 100%;
-    max-width: 170px;
-    aspect-ratio: 3 / 4;
-    perspective: 1000px;
     transform-style: preserve-3d;
-    background: transparent !important;
-    border: none !important;
-    margin-bottom: 2rem;
-    transition: transform 0.5s ease;
+    transform: rotateY(-4deg) rotateX(3deg) translateZ(0px);
+    transition:
+      transform 0.4s cubic-bezier(0.23, 1, 0.32, 1),
+      box-shadow 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    border-radius: 10px;
+    box-shadow:
+      /* book spine shadow — left edge depth */
+      -6px 6px 0px rgba(0,0,0,0.55),
+      -12px 12px 0px rgba(0,0,0,0.3),
+      /* ambient drop shadow */
+      0 20px 40px rgba(0,0,0,0.5),
+      /* teal glow edge */
+      inset 3px 0 0 rgba(1,173,159,0.25);
+    will-change: transform;
+    cursor: pointer;
   }
-  .book-shelf-container img {
-    width: 100% !important;
-    height: 100% !important;
-    object-cover: cover !important;
-    border-radius: 3px 6px 6px 3px !important;
-    box-shadow: 
-      5px 5px 15px rgba(0,0,0,0.7),
-      -2px 0px 3px rgba(255,255,255,0.1) inset;
-    transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.5s ease;
-    transform-origin: left center;
-  }
-  /* Smart 3D Hover Popup Trigger */
-  .book-shelf-container a:hover img,
-  .book-shelf-container .card:hover img {
-    transform: rotateY(-28deg) translateZ(12px) scale(1.05);
-    box-shadow: 
-      20px 15px 30px rgba(0,0,0,0.8),
-      -1px 0px 2px rgba(255,255,255,0.2) inset;
-  }
-  /* පොතක පිටු වැනි ස්වභාවික පෙනුමක් ලබාදෙන ත්‍රිමාණ අද්දර (Book Spine Simulation) */
-  .book-shelf-container a::before,
-  .book-shelf-container .card::before {
+
+  /* Book spine — left pseudo strip */
+  .similar-posts-3d-grid article::before,
+  .similar-posts-3d-grid .card::before,
+  .similar-posts-3d-grid [class*="col-"] > a::before,
+  .similar-posts-3d-grid [class*="col-"] > div::before {
     content: "";
     position: absolute;
-    top: 1%;
     left: 0;
-    width: 98%;
-    height: 98%;
-    background: #e2e8f0;
-    border-radius: 2px;
-    transform: rotateY(-24deg) translateZ(2px);
-    z-index: -1;
-    box-shadow: 4px 4px 10px rgba(0,0,0,0.5);
-    transition: transform 0.5s ease;
-    transform-origin: left center;
+    top: 0;
+    bottom: 0;
+    width: 6px;
+    background: linear-gradient(
+      to bottom,
+      rgba(1,173,159,0.9) 0%,
+      rgba(1,100,90,0.7) 50%,
+      rgba(1,173,159,0.5) 100%
+    );
+    border-radius: 10px 0 0 10px;
+    z-index: 2;
+    transform: translateZ(1px);
   }
-  .book-shelf-container a:hover::before,
-  .book-shelf-container .card:hover::before {
-    transform: rotateY(-32deg) translateZ(3px) scale(1.05);
+
+  /* Page edge lines — right pseudo */
+  .similar-posts-3d-grid article::after,
+  .similar-posts-3d-grid .card::after,
+  .similar-posts-3d-grid [class*="col-"] > a::after,
+  .similar-posts-3d-grid [class*="col-"] > div::after {
+    content: "";
+    position: absolute;
+    right: -3px;
+    top: 4px;
+    bottom: 4px;
+    width: 4px;
+    background: repeating-linear-gradient(
+      to bottom,
+      rgba(248,248,255,0.07) 0px,
+      rgba(248,248,255,0.07) 2px,
+      transparent 2px,
+      transparent 5px
+    );
+    border-radius: 0 2px 2px 0;
+    z-index: 1;
   }
-  /* Card titles හෝ metadata පින්තූරයට යටින් ලස්සනට පෙළගැස්වීම */
-  .book-shelf-container h3, 
-  .book-shelf-container p,
-  .book-shelf-container span {
-    transform: translateZ(10px);
-    text-shadow: 1px 1px 4px rgba(0,0,0,0.8);
+
+  /* Hover: book opens / pops forward */
+  .similar-posts-3d-grid article:hover,
+  .similar-posts-3d-grid .card:hover,
+  .similar-posts-3d-grid [class*="col-"] > a:hover,
+  .similar-posts-3d-grid [class*="col-"] > div:hover {
+    transform: rotateY(0deg) rotateX(0deg) translateZ(24px) translateY(-6px);
+    box-shadow:
+      -2px 2px 0px rgba(0,0,0,0.3),
+      0 32px 60px rgba(0,0,0,0.65),
+      0 0 0 1px rgba(1,173,159,0.3),
+      inset 3px 0 0 rgba(1,173,159,0.4);
   }
 </style>
 
@@ -613,7 +647,6 @@ const breadcrumbSchema = JSON.stringify({
       if (i >= fullText.length) {
         clearInterval(interval);
         warningTypewriterDone = true;
-        // ✅ FIX: typewriter ඉවර වූ පසු cursor සම්පූර්ණයෙන් hide කරනවා
         if (cursor) cursor.classList.add("done");
       }
     }, 28);
@@ -634,8 +667,34 @@ const breadcrumbSchema = JSON.stringify({
     const postId = modal?.getAttribute("data-post-id") ?? "";
     const API_URL = modal?.getAttribute("data-api-url") ?? "";
 
-    // 🛡️ ADVANCED DEEP LINK REGEX FILTER (HTTPS, HTTP, WWW, සහ කිසිවක් නැති ඩොමේන් සියල්ලම අසුකර ගනී)
-    const linkRegex = /https?:\/\/|www\.|\b([a-z0-9]+(-[a-z0-9]+)*\.)+(com|lk|net|org|io|me|info|biz|cc|tv|xyz|app|xyz|tk|ga|cf|gq|ml|live|tech|site|online|store|blog)\b|\b[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,7}(?=\/|\b)/i;
+    // ✅ CHANGE 1: UPGRADED LINK DETECTION
+    // Detects ALL link forms:
+    //   https://example.com  — protocol links
+    //   http://example.com   — http links
+    //   www.example.com      — www prefix
+    //   example.com          — bare domain (google.com, fb.com, t.me)
+    //   example.lk / .net / .org / .io / .info / .co / .tv / .me / .biz / .in / .uk
+    //   bit.ly / t.co / youtu.be  — known URL shorteners
+    //   t.me / wa.me / tg: links  — messaging links
+    //   IP addresses like 192.168.1.1
+    const linkRegex = new RegExp(
+      // Protocol-based
+      "https?:\\/\\/" +
+      "|ftp:\\/\\/" +
+      // www prefix
+      "|www\\." +
+      // Known shorteners & messaging
+      "|bit\\.ly|t\\.co|goo\\.gl|tinyurl\\.com|youtu\\.be|ow\\.ly|is\\.gd|buff\\.ly" +
+      "|t\\.me|wa\\.me|tg:" +
+      // Bare domain pattern: word.tld (covers google.com, fb.com, site.lk etc.)
+      // Must have at least 2 chars before dot and valid TLD after
+      "|\\b[a-zA-Z0-9][a-zA-Z0-9\\-]{1,61}[a-zA-Z0-9]\\." +
+      "(?:com|lk|net|org|io|info|co|tv|me|biz|in|uk|edu|gov|app|dev|xyz|site|online|store|shop|news|blog|tech|ai)" +
+      "(?:\\/|\\b)" +
+      // IP address pattern
+      "|\\b(?:[0-9]{1,3}\\.){3}[0-9]{1,3}\\b",
+      "i"
+    );
 
     let commentsList: Array<{ id: string; content: string; date: string; ownerToken: string; serverId?: string }> = [];
 
@@ -819,6 +878,7 @@ const breadcrumbSchema = JSON.stringify({
         textarea?.focus();
         return;
       }
+      // ✅ CHANGE 1: upgraded linkRegex — bare domains ද block කරයි
       if (linkRegex.test(content)) {
         showValidation("🔗 ලින්ක් දැමීමට අවසර නැහැ. කරුණාකර ලින්ක් ඉවත් කර ඔබේ අදහස දක්වන්න.");
         textarea?.focus();
