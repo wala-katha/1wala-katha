@@ -1,3 +1,4 @@
+
 ---
 import Share from "@/components/Share.astro";
 import SimilarPosts from "@/layouts/components/SimilarPosts.astro";
@@ -25,7 +26,43 @@ const finalSimilarPosts = smartSimilarPosts.slice(0, 6);
 
 // ✅ SAFE: Token frontend එකේ නැහැ — Worker side validate කරනවා
 const WORKER_API = "https://comments.wala-katha.workers.dev/api/comments";
+
+// SEO: canonical URL සහ structured data සඳහා
+const siteUrl = "https://wala-katha.lk";
+const postUrl = `${siteUrl}/posts/${post.id}`;
+const publishedDate = date ? new Date(date).toISOString() : "";
+const authorName = allAuthors.find((a) =>
+  authors?.map((au: string) => slugify(au)).includes(slugify(a.data.title))
+)?.data.title ?? "Wala Katha";
 ---
+
+{/* ═══════════════════════════════════════════════════
+    🔍 SEO — JSON-LD Structured Data (Article schema)
+════════════════════════════════════════════════════ */}
+<script type="application/ld+json" set:html={JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": title,
+  "description": description ?? "",
+  "image": image ? `${siteUrl}${image}` : undefined,
+  "datePublished": publishedDate,
+  "dateModified": publishedDate,
+  "author": {
+    "@type": "Person",
+    "name": authorName
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Wala Katha",
+    "url": siteUrl
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": postUrl
+  },
+  "keywords": tags?.join(", ") ?? "",
+  "articleSection": categories?.join(", ") ?? ""
+})} />
 
 <section class="section bg-[#010203] relative">
   <div class="container">
@@ -45,6 +82,7 @@ const WORKER_API = "https://comments.wala-katha.workers.dev/api/comments";
                 <a
                   href={`/authors/${slugify(author.id)}`}
                   class="flex items-center hover:text-primary font-bold text-[#F8F8FF]"
+                  rel="author"
                 >
                   {author.data.image && (
                     <Image
@@ -61,7 +99,7 @@ const WORKER_API = "https://comments.wala-katha.workers.dev/api/comments";
           </li>
           <li class="mx-3 flex items-center flex-wrap font-semibold text-[#F8F8FF]">
             <BiCalendarEdit className="mr-1 h-5 w-5 text-[#01AD9F]" />
-            {dateFormat(date)}
+            <time datetime={publishedDate}>{dateFormat(date)}</time>
           </li>
           <li class="mx-3 flex items-center flex-wrap">
             <BiCategoryAlt className="mr-1 h-[18px] w-[18px] text-[#01AD9F]" />
@@ -71,6 +109,7 @@ const WORKER_API = "https://comments.wala-katha.workers.dev/api/comments";
                   <a
                     href={`/categories/${slugify(category)}`}
                     class="mr-2 hover:text-primary font-bold bg-white/10 px-2 py-0.5 rounded text-[#F8F8FF]"
+                    rel="tag"
                   >
                     {humanize(category)}
                     {i !== categories.length - 1 && ","}
@@ -108,6 +147,7 @@ const WORKER_API = "https://comments.wala-katha.workers.dev/api/comments";
                 <a
                   href={`/tags/${slugify(tag)}`}
                   class="block rounded-lg bg-[#FFCC00] border border-[#FFCC00] px-4 py-2 font-black text-[#010203] text-sm hover:bg-[#E6B800] transition duration-300"
+                  rel="tag"
                 >
                   #{humanize(tag)}
                 </a>
@@ -407,6 +447,15 @@ const WORKER_API = "https://comments.wala-katha.workers.dev/api/comments";
   //    Worker side `/api/comments/:id` PATCH endpoint expect කරනවා
   //    { content } body එකක් සමඟ. API call fail වූ විට user ට
   //    validation message පෙන්වා DOM revert කරනවා.
+  //
+  // ✅ FIX 3 — DELETE NOT PERSISTING ROOT CAUSE:
+  //    deleteConfirmBtn click handler DOM එකෙන් card remove කළත්
+  //    Worker API ට DELETE request යවන්නේ නොවෙ.
+  //    Page refresh කළාම server data load වෙලා comment ආපහු එනවා.
+  //
+  //    FIX: deleteConfirmBtn handler එකට Worker API DELETE call add කළා.
+  //    Worker side `/api/comments/:id` DELETE endpoint expect කරනවා.
+  //    API call fail වූ විට DOM revert කරලා validation message පෙන්වනවා.
   // ════════════════════════════════════════════════════════════════
 
   function getSessionToken(): string {
@@ -804,8 +853,9 @@ const WORKER_API = "https://comments.wala-katha.workers.dev/api/comments";
     deleteCancelBtn?.addEventListener("click", closeDeleteModal);
     deleteModal?.addEventListener("click", (e) => { if (e.target === deleteModal) closeDeleteModal(); });
 
-    deleteConfirmBtn?.addEventListener("click", () => {
-      if (!activeCommentId || !commentsListHook) return;
+    // ✅ FIX 3: Delete confirm — Worker API ට DELETE request යවනවා
+    deleteConfirmBtn?.addEventListener("click", async () => {
+      if (!activeCommentId || !commentsListHook || !deleteConfirmBtn) return;
 
       const entry = commentsList.find((c) => c.id === activeCommentId);
       if (!entry || entry.ownerToken !== SESSION_TOKEN) {
@@ -813,8 +863,10 @@ const WORKER_API = "https://comments.wala-katha.workers.dev/api/comments";
         return;
       }
 
-      commentsList = commentsList.filter((c) => c.id !== activeCommentId);
+      // Optimistic UI update — API call කලිනුත් DOM remove කරනවා
+      const removedEntry = { ...entry };
       const card = commentsListHook.querySelector(`[data-comment-id="${activeCommentId}"]`);
+      commentsList = commentsList.filter((c) => c.id !== activeCommentId);
       if (card) card.remove();
 
       if (commentsList.length === 0 && noCommentsMsg) {
@@ -822,7 +874,48 @@ const WORKER_API = "https://comments.wala-katha.workers.dev/api/comments";
         noCommentsMsg.textContent = "තවම කමෙන්ට්ස් කිසිවක් නැත. පළමුවැන්නා වන්න!";
       }
 
+      deleteConfirmBtn.disabled = true;
+
       closeDeleteModal();
+
+      // Worker API endpoint: DELETE /api/comments/:serverId
+      // serverId නොමැති නම් (locally generated comment) local remove පමණයි
+      if (removedEntry.serverId) {
+        try {
+          const res = await fetch(`${API_URL}/${removedEntry.serverId}`, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+          });
+
+          if (!res.ok) {
+            // API fail — revert: card එක ආපහු add කරනවා
+            commentsList.push(removedEntry);
+            renderCommentCard(
+              removedEntry.id,
+              removedEntry.content,
+              removedEntry.date,
+              removedEntry.ownerToken
+            );
+            if (noCommentsMsg) noCommentsMsg.style.display = "none";
+            const err = await res.json().catch(() => ({})) as { error?: string };
+            showValidation(err.error ?? "කමෙන්ට් එක මකීමට නොහැකි වුණා. නැවත උත්සාහ කරන්න.");
+          }
+        } catch (err) {
+          console.error("Delete error:", err);
+          // Network error — revert
+          commentsList.push(removedEntry);
+          renderCommentCard(
+            removedEntry.id,
+            removedEntry.content,
+            removedEntry.date,
+            removedEntry.ownerToken
+          );
+          if (noCommentsMsg) noCommentsMsg.style.display = "none";
+          showValidation("ජාල දෝෂයක් ඇති විය. ඔබේ සම්බන්ධතාව පරීක්ෂා කරන්න.");
+        }
+      }
+
+      deleteConfirmBtn.disabled = false;
     });
   }
 
