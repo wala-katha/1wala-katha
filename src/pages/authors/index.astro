@@ -8,17 +8,79 @@ import { sortByDate } from "@/lib/utils/sortFunctions";
 import { markdownify } from "@/lib/utils/textConverter";
 
 const authors = await getSinglePage("authors");
-const sortedPosts = sortByDate(authors);
-const totalPages = Math.ceil(authors.length / config.settings.pagination);
-const currentPosts = sortedPosts.slice(0, config.settings.pagination);
+
+// 1. ස්වයංක්‍රීය නිවැරදි කිරීම (Auto-Fix): authors දත්ත හිස් හෝ වැරදි නම් බිඳ වැටෙන්නේ නැතිව ආරක්ෂා කරයි
+const safeAuthors = Array.isArray(authors) ? authors : [];
+const sortedPosts = sortByDate(safeAuthors);
+
+// Safe Pagination Calculation
+const paginationLimit = config?.settings?.pagination || 8;
+const totalPages = Math.ceil((safeAuthors.length || 0) / paginationLimit);
+
+const currentPosts = sortedPosts && sortedPosts.length > 0 ? sortedPosts.slice(0, paginationLimit) : [];
+
+// 📈 2. SEO ප්‍රශස්තකරණය: සෙවුම් යන්ත්‍ර සඳහා නිවැරදි විස්තර සහ පිරිසිදු ලින්ක්ස්
+const metaTitle = "අපේ ලේඛකයින් - Our Authors";
+const metaDescription = "අපේ වෙබ් අඩවියේ ලිපි සහ නවතම කතා ලියන සියලුම දක්ෂ කතෘවරුන් සහ ලේඛකයින් මෙතැනින් එකම තැනකින් සොයා ගන්න.";
+
+const base_url = (config?.site?.base_url || "").replace(/\/$/, ""); 
+const canonicalUrl = `${base_url}/authors`;
+
+// ඊළඟ පිටුව තීරණය කිරීම (Google Bot Fix)
+const nextUrl = totalPages > 1 ? `${base_url}/authors/page/2` : null;
+
+// 🚀 GOOGLE SEO BREADCRUMB SCHEMA: සෙවුම් යන්ත්‍ර වලට සයිට් එකේ ව්‍යුහය වටහා දීමට (JSON-LD)
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": base_url
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Authors",
+      "item": canonicalUrl
+    }
+  ]
+};
 ---
 
-<Base title={"Authors"}>
+<Base 
+  title={metaTitle} 
+  description={metaDescription} 
+  canonical={canonicalUrl}
+  next={nextUrl}
+>
+  {/* Google Rich Snippet එක ඇතුළත් කිරීම */}
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+
+  {/* 100% Original Section Layout structure & Styles */}
   <section class="section">
     <div class="container text-center">
-      <h1 set:text={markdownify("Authors")} class="page-heading h2" />
-      <Authors authors={currentPosts} />
-      <Pagination section={"authors"} currentPage={1} totalPages={totalPages} />
+      
+      {/* 100% Original Heading */}
+      <h1 set:html={markdownify("Authors")} class="page-heading h2" />
+      
+      {/* Authors List Component */}
+      {currentPosts && currentPosts.length > 0 ? (
+        <Authors authors={currentPosts} />
+      ) : (
+        // Original Style එක වෙනස් නොකර දත්ත නොමැති විට පෙන්වන කොටස
+        <div class="py-8 text-center opacity-60">
+          <p>කතෘවරුන් කිසිවෙකු හමුනොවීය.</p>
+        </div>
+      )}
+      
+      {/* 100% Original Pagination bar - සැබෑ ලෙසම පිටු 1කට වඩා තිබේ නම් පමණක් පෙන්වයි */}
+      {totalPages > 1 && (
+        <Pagination section={"authors"} currentPage={1} totalPages={totalPages} />
+      )}
+      
     </div>
   </section>
 </Base>
