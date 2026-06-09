@@ -1,33 +1,32 @@
 import { format, isValid } from "date-fns";
 
-interface DateDisplayProps {
-  date: Date | string;
-}
+/**
+ * Astro වෙබ් අඩවිය සඳහා කළු පසුබිමට සහ SEO වලට ගැළපෙන පරිදි 
+ * දිනය කොටස් වශයෙන් ලබා දෙන ශ්‍රිතය.
+ * දිනය වැරදි හෝ නොමැති නම් ස්වයංක්‍රීයව අද දිනය (Current Date) ලබා ගනී.
+ */
+const dateFormat = (date: Date | string) => {
+  let dateObj: Date;
 
-const DateDisplay = ({ date }: DateDisplayProps) => {
-  if (!date) return null;
+  // 1. දිනයක් ලබා දී නොමැති නම් හෝ හිස් නම්, ස්වයංක්‍රීයව අද දිනය (Current Date) ලබා ගනී
+  if (!date) {
+    dateObj = new Date();
+  } else {
+    dateObj = typeof date === "string" ? new Date(date) : date;
+  }
 
-  const dateObj = typeof date === "string" ? new Date(date) : date;
+  // 2. ලබා දුන් දිනය වලංගු නොවේ නම් (Invalid Date), එයද ස්වයංක්‍රීයව අද දිනයට හැරවේ
+  if (!isValid(dateObj)) {
+    dateObj = new Date();
+  }
 
-  // දිනය වලංගු නොවේ නම් කිසිවක් පෙන්වන්නේ නැත (Crash වීම් වැළැක්වීමට)
-  if (!isValid(dateObj)) return null;
-
-  // දවස, මාසය සහ අවුරුද්ද වෙන වෙනම Format කර ගැනීම
-  const day = format(dateObj, "dd");
-  const month = format(dateObj, "MMM");
-  const year = format(dateObj, "yyyy");
-  const isoString = dateObj.toISOString();
-
-  return (
-    <div className="bg-slate-900 p-4 rounded-lg inline-block">
-      {/* SEO වලට 100% ගැලපෙන සහ කළු පසුබිමේ ලස්සනට කැපී පෙනෙන ආකාරය */}
-      <time dateTime={isoString} className="text-sm tracking-wide">
-        <span className="text-amber-400 font-bold">{day}</span>{" "}
-        <span className="text-slate-200">{month}</span>,{" "}
-        <span className="text-slate-400 text-xs">{year}</span>
-      </time>
-    </div>
-  );
+  // කළු පසුබිමක වෙන වෙනම ඉස්මතු කිරීමට සහ SEO සඳහා දත්ත සකස් කිරීම
+  return {
+    day: format(dateObj, "dd"),          // උදා: "09"
+    month: format(dateObj, "MMM"),       // උදා: "Jun"
+    year: format(dateObj, "yyyy"),       // උදා: "2026"
+    isoString: dateObj.toISOString(),    // SEO (Google Bot) සඳහා: "2026-06-09T02:30:00.000Z"
+  };
 };
 
-export default DateDisplay;
+export default dateFormat;
