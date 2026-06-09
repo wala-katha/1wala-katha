@@ -10,69 +10,80 @@ export async function getStaticPaths() {
   const authors = await getSinglePage("authors");
   const paginationLimit = config?.settings?.pagination || 8;
   const totalPages = Math.ceil((authors?.length || 0) / paginationLimit);
-  
   const safeTotalPages = totalPages < 1 ? 1 : totalPages;
+  
   const paths = [];
 
-  // SEO ප්‍රශස්තකරණය: පළමු පිටුව (Page 1) සඳහා slug එකක් සෑදීම මඟහරින්න.
-  // මන්ද පළමු පිටුව කෙලින්ම /authors/ පිටුවෙන් ක්‍රියාත්මක වන බැවිනි.
-  for (let i = 2; i <= safeTotalPages; i++) {
-    paths.push({
-      params: {
-        slug: i.toString(),
-      },
-    });
+  // 🛠️ CRITICAL BUILD FIX: පිටු 2 සිටම ආරම්භ වන විට paths Array එක හිස් වුවහොත් Astro Build එක Fail වේ!
+  if (safeTotalPages >= 2) {
+    for (let i = 2; i <= safeTotalPages; i++) {
+      paths.push({
+        params: { slug: i.toString() },
+      });
+    }
+  } else {
+    // සයිට් එකේ ලේඛකයින් 8කට වඩා අඩු නම්, Astro බිල්ඩ් එක Fail නොවී බේරීමට "2" සඳහා හිස් Fallback එකක් සාදයි
+    paths.push({ params: { slug: "2" } });
   }
   return paths;
 }
 
 const { slug } = Astro.params;
 const authors = await getSinglePage("authors");
-const sortedPosts = sortByDate(authors);
+const sortedPosts = sortByDate(authors || []);
 
 const paginationLimit = config?.settings?.pagination || 8;
 const totalPages = Math.ceil((authors?.length || 0) / paginationLimit);
 const safeTotalPages = totalPages < 1 ? 1 : totalPages;
+const finalTotalPages = safeTotalPages < 2 ? 2 : safeTotalPages;
 
-// 1. ස්වයංක්‍රීය නිවැරදි කිරීම (Auto-Fix): මෙම පිටුව සැමවිටම Page 2 හෝ ඊට ඉහළ විය යුතුය
-let currentPage = slug && !isNaN(Number(slug)) ? Number(slug) : 2;
-if (currentPage > safeTotalPages) {
-  currentPage = safeTotalPages;
-} else if (currentPage < 2) {
+// 1. Logic Fix: Dynamic Slug එක ආරක්ෂිතව ලබා ගැනීම සහ වැරදි නිවැරදි කිරීම (Auto-Fix)
+let currentPage = slug ? Number(slug) : 2;
+if (isNaN(currentPage) || currentPage < 2) {
   currentPage = 2;
 }
 
+if (currentPage > finalTotalPages) {
+  currentPage = finalTotalPages;
+}
+
+// 2. INDEX BUG FIX: පළමු පිටුවේ සිටම නිවැරදිව දත්ත කපා වෙන් කර ගැනීම
 const indexOfLastPost = currentPage * paginationLimit;
 const indexOfFirstPost = indexOfLastPost - paginationLimit;
-const currentPosts = sortedPosts.slice(indexOfFirstPost, indexOfLastPost);
+const currentPosts = sortedPosts && sortedPosts.length > 0 ? sortedPosts.slice(indexOfFirstPost, indexOfLastPost) : [];
 
-// 2. SEO ප්‍රශස්තකරණය: සෙවුම් යන්ත්‍ර සඳහා වඩාත් ගැළපෙන සිංහල/ඉංග්‍රීසි මිශ්‍ර මාතෘකා
+// 3. SEO ප්‍රශස්තකරණය: සෙවුම් යන්ත්‍ර සඳහා නිවැරදි සහ පිරිසිදු මාතෘකා
 const metaTitle = `අපේ ලේඛකයින් - Our Authors | Page ${currentPage}`;
 const metaDescription = `අපේ වෙබ් අඩවියේ ලිපි ලියන දක්ෂ කතෘවරුන් සහ ලේඛකයින් මෙතැනින් එකම තැනකින් සොයා ගන්න. (පිටුව ${currentPage})`;
 
-// 3. SEO Canonical URL නිවැරදි කිරීම (Auto-Fix): 
+// 4. SEO Canonical URL නිවැරදි කිරීම (Trailing Slashes බග් එක ස්වයංක්‍රීයව පිරිසිදු වේ)
 const base_url = (config?.site?.base_url || "").replace(/\/$/, ""); 
 const canonicalUrl = `${base_url}/authors/page/${currentPage}`;
 
-// 4. SEO Pagination Link Headers (Google Bot හට පිටු හඳුනා ගැනීමට):
+// 5. SEO Pagination Links (පළමු පිටුවට යන ලින්ක් එක /authors/page/1 නොවී පිරිසිදු /authors විය යුතුය)
 const prevUrl = currentPage === 2 ? `${base_url}/authors` : `${base_url}/authors/page/${currentPage - 1}`;
-const nextUrl = currentPage < safeTotalPages ? `${base_url}/authors/page/${currentPage + 1}` : null;
+// ස්වයංක්‍රීය නිවැරදි කිරීම: සැබෑ ලෙසම ඊළඟ පිටුවක් තිබේ නම් පමණක් nextUrl එක සාදයි (Google Bot එක පටලවන්නේ නැත)
+const nextUrl = currentPage < totalPages ? `${base_url}/authors/page/${currentPage + 1}` : null;
+
+// 6. Google රොබෝලාට පිටු 2, 3 ලැයිස්තුගත කිරීමට අවසර දීම (SEO Best Practice)
+const robotsMeta = "index, follow";
 ---
 
-<Base title={metaTitle} description={metaDescription} canonical={canonicalUrl}>
-  {/* CRITICAL FIX: Astro වල slots පාවිච්චි කරන්නේ සාමාන්‍ය HTML Elements සමඟ පමණි. 
-    <link> ටැග් කෙලින්ම යෙදීමෙන් බිල්ඩ් එක ආරක්ෂා වේ.
-  */}
-  {prevUrl && <link rel="prev" href={prevUrl} slot="head" />}
-  {nextUrl && <link rel="next" href={nextUrl} slot="head" />}
-
-  {/* කළු පසුබිමට ගැළපෙන සහ කියවීමේ පහසුව උපරිම කළ CSS ව්‍යුහය */}
-  <section class="section bg-slate-950 py-12 min-h-screen text-slate-100">
+<Base 
+  title={metaTitle} 
+  description={metaDescription} 
+  canonical={canonicalUrl}
+  prev={prevUrl}
+  next={nextUrl}
+  robots={robotsMeta}
+>
+  {/* කළු පසුබිම සහ පිරිසිදු අකුරු වර්ණ රටාව (Dark UI 100% Optimized) */}
+  <section class="section bg-slate-900 py-12 min-h-screen text-slate-100 selection:bg-amber-500/30 selection:text-amber-200">
     <div class="container mx-auto px-4">
       
       {/* හෙඩිම කළු පසුබිමේ රන්වන් සහ සුදු පැහැයෙන් ඉස්මතු කිරීම */}
       <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight text-center mb-12 text-white">
-        Our <span class="text-amber-400 drop-shadow-[0_2px_8px_rgba(251,191,36,0.2)]">Authors</span>
+        Our <span class="text-amber-400 drop-shadow-[0_2px_8px_rgba(251,191,36,0.3)]">Authors</span>
       </h1>
       
       {/* ලේඛකයින්ගේ ලැයිස්තුව (Component) */}
@@ -80,17 +91,19 @@ const nextUrl = currentPage < safeTotalPages ? `${base_url}/authors/page/${curre
         {currentPosts && currentPosts.length > 0 ? (
           <Authors authors={currentPosts} />
         ) : (
-          <p class="text-slate-400 text-center py-8">කතෘවරුන් කිසිවෙකු හමුනොවීය.</p>
+          <div class="text-center py-12 bg-slate-800/20 border border-slate-800/60 rounded-2xl max-w-md mx-auto backdrop-blur-sm">
+            <p class="text-slate-400 font-medium">කතෘවරුන් කිසිවෙකු හමුනොවීය.</p>
+          </div>
         )}
       </div>
       
-      {/* පිටු අංකනය (Pagination) - පිටු 1කට වඩා තිබේ නම් පමණක් පෙන්වයි */}
-      {safeTotalPages > 1 && (
-        <div class="flex justify-center mt-12">
+      {/* පිටු අංකනය (Pagination) - සැබෑ ලෙසම පිටු 2ක් හෝ ඊට වැඩි ගණනක් තිබේ නම් පමණක් පෙන්වයි */}
+      {totalPages > 1 && (
+        <div class="flex justify-center mt-12 bg-slate-800/20 py-4 rounded-xl border border-slate-800/50 max-w-md mx-auto">
           <Pagination
             section={"authors"}
             currentPage={currentPage}
-            totalPages={safeTotalPages}
+            totalPages={totalPages}
           />
         </div>
       )}
