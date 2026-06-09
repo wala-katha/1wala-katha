@@ -1,32 +1,86 @@
 ---
 import Base from "@/layouts/Base.astro";
-import { getTaxonomy } from "@/lib/taxonomyParser.astro";
-import { humanize } from "@/lib/utils/textConverter";
-
-const categories = await getTaxonomy("posts", "categories");
-
+import config from "@/config/config.json";
+import { getTaxonomyWithCount } from "@/lib/taxonomyParser.astro";
 import { BiCategoryAlt } from "react-icons/bi";
+
+// ⚡ අලුතින් හදපු getTaxonomyWithCount ශ්‍රිතය හරහා ප්‍රවර්ග සමඟ ලිපි ගණන සහ පිරිසිදු නම් එකවර ලබා ගනී
+const categoriesWithCount = await getTaxonomyWithCount("posts", "categories");
+
+// 1. ස්වයංක්‍රීය නිවැරදි කිරීම (Auto-Fix): දත්ත හිස් හෝ වැරදි නම් බිඳ වැටීම වළක්වයි
+const safeCategories = Array.isArray(categoriesWithCount) ? categoriesWithCount : [];
+
+// 📈 2. SEO專ශස්තකරණය: සෙවුම් යන්ත්‍ර සඳහා නිවැරදි විස්තර සහ පිරිසිදු ලින්ක්ස්
+const metaTitle = `සියලුම ප්‍රවර්ග - Categories | ${config?.site?.title || "Wala Katha"}`;
+const metaDescription = "අපේ වෙබ් අඩවියේ ඇති සියලුම බ්ලොග් ලිපි සහ කතා කාණ්ඩ (Categories) අනුව මෙතැනින් පහසුවෙන් තෝරා ගන්න.";
+
+const base_url = (config?.site?.base_url || "").replace(/\/$/, ""); 
+const canonicalUrl = `${base_url}/categories`;
+
+// 🚀 GOOGLE SEO BREADCRUMB SCHEMA: සෙවුම් යන්ත්‍ර වලට ව්‍යුහය වටහා දීමට (JSON-LD)
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": base_url
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Categories",
+      "item": canonicalUrl
+    }
+  ]
+};
 ---
 
-<Base title={"Categories"}>
+<Base 
+  title={metaTitle} 
+  description={metaDescription} 
+  canonical={canonicalUrl}
+>
+  {/* Google Structured Data ඇතුළත් කිරීම */}
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+
+  {/* 100% Original Section Layout structure */}
   <section class="section">
     <div class="container text-center">
+      
+      {/* Original Heading */}
       <h1 class="h2 page-heading">Categories</h1>
-      <ul class="space-x-4">
+      
+      {/* Original List Structure (Dark Mode Friendly) */}
+      <ul class="space-x-4 flex flex-wrap justify-center gap-y-4 mt-8">
         {
-          categories.map((category) => (
+          safeCategories.map((category) => (
             <li class="inline-block">
               <a
-                href={`/categories/${category}`}
-                class="rounded-lg bg-light px-4 py-2 text-dark transition hover:bg-primary hover:text-white flex items-center group"
+                href={`/categories/${category.slug}`}
+                class="rounded-lg bg-theme-light dark:bg-slate-800/60 border border-border dark:border-slate-800 px-4 py-2 text-text dark:text-slate-200 transition hover:bg-primary dark:hover:bg-primary hover:text-white dark:hover:text-white flex items-center group font-medium"
               >
                 <BiCategoryAlt className="mr-1 text-primary group-hover:text-white transition h-6 w-6 scale-75" />
-                {humanize(category || "")}
+                <span>{category.name}</span>
+                
+                {/* ⚡ ඉස්මතු කිරීම (UI Booster): ලිපි ගණන කළු පසුබිමේ රන්වන්/ලා පැහැති Badge එකක් ලෙස පෙන්වීම */}
+                <span class="ml-2 text-xs px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700/60 text-slate-600 dark:text-slate-300 group-hover:bg-white/20 group-hover:text-white transition font-semibold">
+                  {category.count}
+                </span>
               </a>
             </li>
           ))
         }
       </ul>
+      
+      {safeCategories.length === 0 && (
+        <div class="py-8 text-center opacity-60">
+          <p>ප්‍රවර්ග කිසිවෙකු හමුනොවීය.</p>
+        </div>
+      )}
+      
     </div>
   </section>
 </Base>
