@@ -4,6 +4,7 @@ import { getSinglePage } from "@/lib/contentParser.astro";
 import dateFormat from "@/lib/utils/dateFormat";
 import { Image } from "astro:assets";
 
+import config from "@/config/config.json"; 
 import { sortByDate } from "@/lib/utils/sortFunctions";
 import { humanize, slugify } from "@/lib/utils/textConverter";
 import type { CollectionEntry } from "astro:content";
@@ -12,6 +13,9 @@ import AuthorSingle from "@/partials/AuthorSingle.astro";
 
 export async function getStaticPaths() {
   const authors = await getSinglePage("authors");
+
+  // ස්වයංක්‍රීය නිවැරදි කිරීම: Authors ලැයිස්තුව හිස් නම් බිල්ඩ් එක Fail වීම වළක්වයි
+  if (!authors || authors.length === 0) return [];
 
   const paths = authors.map((author) => ({
     params: {
@@ -23,16 +27,44 @@ export async function getStaticPaths() {
 }
 
 const { author } = Astro.props;
-const { title, meta_title, description, image } = author.data;
 
-// Author Posts
+// 1. දත්ත හිස් නම් සිදුවන සයිට් ක්‍රෑෂ් (Crash) වැළැක්වීම (Auto-Fix)
+if (!author || !author.data) {
+  return Astro.redirect("/404");
+}
+
+const { title, meta_title, description, image } = author.data;
+const authorTitle = title || "";
+
+// Author Posts ආරක්ෂිතව ලබා ගැනීම සහ Filter කිරීම
 const posts = await getSinglePage("posts");
-const sortPostsByDate: CollectionEntry<"posts">[] = sortByDate(posts);
+const sortPostsByDate: CollectionEntry<"posts">[] = sortByDate(posts || []);
+
 const currentPosts = sortPostsByDate.filter((post) => {
+  if (!post?.data?.authors || !Array.isArray(post.data.authors)) return false;
+  
   return post.data.authors
-    .map((author) => slugify(author))
-    .includes(slugify(title));
+    .map((authorName) => slugify(authorName || ""))
+    .includes(slugify(authorTitle));
 });
+
+// 📈 SEO ප්‍රශස්තකරණය: Canonical URL එක Trailing Slashes බග් එක නැතිව පිරිසිදුව සැකසීම
+const base_url = (config?.site?.base_url || "").replace(/\/$/, ""); 
+const canonicalUrl = `${base_url}/authors/${author.id}`;
+
+// 🚀 GOOGLE SEO RICH SNIPPETS: Schema JSON-LD දත්ත ව්‍යුහය
+const schemaMarkup = {
+  "@context": "https://schema.org",
+  "@type": "ProfilePage",
+  "mainEntity": {
+    "@type": "Person",
+    "name": authorTitle,
+    "description": description || "",
+    "image": image ? (image.startsWith("http") ? image : `${base_url}${image}`) : undefined,
+    "url": canonicalUrl,
+    "jobTitle": "Content Creator"
+  }
+};
 ---
 
 <Base
@@ -40,66 +72,87 @@ const currentPosts = sortPostsByDate.filter((post) => {
   meta_title={meta_title}
   description={description}
   image={image}
+  canonical={canonicalUrl}
 >
+  <script type="application/ld+json" set:html={JSON.stringify(schemaMarkup)} />
+
+  {/* ලේඛකයාගේ පෞද්ගලික විස්තර කොටස (Original) */}
   <AuthorSingle author={author} />
 
   {
-    currentPosts.length > 0 && (
+    currentPosts && currentPosts.length > 0 && (
       <section class="section pt-0">
         <div class="container">
+          
+          {/* 100% Original Heading */}
           <h2 class="mb-8 text-center h3">Recent Posts</h2>
-          <div
-            class={`row gy-4 ${currentPosts.length < 3 ? "justify-center" : ""}`}
-          >
-            {currentPosts.map((post) => (
+          
+          {/* 100% Original Row Layout Logic */}
+          <div class={`row gy-4 ${currentPosts.length < 3 ? "justify-center" : ""}`}>
+            
+            {currentPosts.map((post, index) => (
               <div class="col-12 sm:col-6 lg:col-4">
-                {post.data.image && (
+                
+                {/* 100% Original Post Image Structure with 100% Fixes */}
+                {post?.data?.image && (
                   <a
-                    href={`/blog/${post.id}/`} // 100% FIX: ඕතර් පේජ් එකේ පින්තූර ලින්ක් එකට නිවැරදිව /blog/ කෑල්ල සහ අගට ස්ලෑෂ් එක එකතු කළා
+                    href={`/blog/${post.id}/`}
                     class="rounded-lg block hover:text-primary overflow-hidden group"
                   >
                     <Image
                       class="group-hover:scale-[1.05] transition duration-300 w-full"
                       src={post.data.image}
-                      alt={post.data.title}
+                      alt={post.data.title || "Post Image"}
                       width={445}
                       height={230}
+                      loading={index < 3 ? "eager" : "lazy"} // Page Speed ප්‍රශස්තකරණය
+                      format="webp" // පින්තූරවල ප්‍රමාණය අඩු කිරීමට
                     />
                   </a>
                 )}
+                
+                {/* 100% Original Meta Data List Structure */}
                 <ul class="mt-4 text-text flex flex-wrap items-center text-sm">
-                  <li class="mb-2 mr-4 flex items-center flex-wrap font-medium">
-                    <BiCalendarEdit className="mr-1 h-[16px] w-[16px] text-gray-600" />
-                    {dateFormat(post.data.date!)}
-                  </li>
-                  <li class="mb-2 mr-4 flex items-center flex-wrap">
-                    <BiCategoryAlt className="mr-1 h-[16px] w-[16px] text-gray-600" />
-
-                    <ul>
-                      {post.data.categories.map((category, i: number) => (
-                        <li class="inline-block">
-                          <a
-                            href={`/categories/${slugify(category)}`}
-                            class="mr-2 hover:text-primary font-medium"
-                          >
-                            {humanize(category)}
-                            {i !== post.data.categories.length - 1 && ","}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  </li>
+                  {post?.data?.date && (
+                    <li class="mb-2 mr-4 flex items-center flex-wrap font-medium">
+                      <BiCalendarEdit className="mr-1 h-[16px] w-[16px] text-gray-600" />
+                      {dateFormat(post.data.date).toString()}
+                    </li>
+                  )}
+                  
+                  {post?.data?.categories && Array.isArray(post.data.categories) && (
+                    <li class="mb-2 mr-4 flex items-center flex-wrap">
+                      <BiCategoryAlt className="mr-1 h-[16px] w-[16px] text-gray-600" />
+                      <ul>
+                        {post.data.categories.map((category, i: number) => (
+                          <li class="inline-block">
+                            <a
+                              href={`/categories/${slugify(category || "")}`}
+                              class="mr-2 hover:text-primary font-medium"
+                            >
+                              {humanize(category || "")}
+                              {i !== post.data.categories!.length - 1 && ","}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </li>
+                  )}
                 </ul>
+                
+                {/* 100% Original Post Title Structure */}
                 <h3 class="h5">
                   <a
-                    href={`/blog/${post.id}/`} // 100% FIX: පෝස්ට් මාතෘකාවේ (Title) ලින්ක් එකටත් නිවැරදිව /blog/ සහ අගට ස්ලෑෂ් එක දැම්මා
+                    href={`/blog/${post.id}/`}
                     class="block hover:text-primary transition duration-300"
                   >
-                    {post.data.title}
+                    {post?.data?.title || "Untitled Post"}
                   </a>
                 </h3>
+                
               </div>
             ))}
+            
           </div>
         </div>
       </section>
