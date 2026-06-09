@@ -8,7 +8,10 @@ import { sortByDate } from "@/lib/utils/sortFunctions";
 
 export async function getStaticPaths() {
   const posts = await getSinglePage("posts");
-  const totalPages = Math.ceil(posts.length / config.settings.pagination);
+  // ස්වයංක්‍රීය නිවැරදි කිරීම: posts හිස් වුවහොත් ව්‍යුහය බිඳ වැටීම වළක්වයි
+  const safePosts = Array.isArray(posts) ? posts : [];
+  const paginationLimit = config?.settings?.pagination || 8;
+  const totalPages = Math.ceil(safePosts.length / paginationLimit);
   const paths = [];
 
   for (let i = 1; i < totalPages; i++) {
@@ -23,19 +26,59 @@ export async function getStaticPaths() {
 
 const { slug } = Astro.params;
 const posts = await getSinglePage("posts");
-const sortedPosts = sortByDate(posts);
-const totalPages = Math.ceil(posts.length / config.settings.pagination);
-const currentPage = slug && !isNaN(Number(slug)) ? Number(slug) : 1;
-const indexOfLastPost = currentPage * config.settings.pagination;
-const indexOfFirstPost = indexOfLastPost - config.settings.pagination;
-const currentPosts = sortedPosts.slice(indexOfFirstPost, indexOfLastPost);
+const safePosts = Array.isArray(posts) ? posts : [];
+const sortedPosts = sortByDate(safePosts);
+
+const paginationLimit = config?.settings?.pagination || 8;
+const totalPages = Math.ceil(safePosts.length / paginationLimit);
+
+// 🛠️ CRITICAL LOGIC FIX: පිටු අංකය පරාසයෙන් බැහැර නම් ස්වයංක්‍රීයව පාලනය කිරීම
+let currentPage = slug && !isNaN(Number(slug)) ? Number(slug) : 1;
+if (currentPage < 1) currentPage = 1;
+if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
+
+const indexOfLastPost = currentPage * paginationLimit;
+const indexOfFirstPost = indexOfLastPost - paginationLimit;
+const currentPosts = sortedPosts && sortedPosts.length > 0 ? sortedPosts.slice(indexOfFirstPost, indexOfLastPost) : [];
+
+// 📈 SEO ප්‍රශස්තකරණය: එක් එක් Pagination පිටුව සඳහා වෙන වෙනම Meta Data සකස් කිරීම
+const metaTitle = `${config?.site?.title || "Wala Katha"} - Page ${currentPage}`;
+const metaDescription = `අපේ වෙබ් අඩවියේ ඇති නවතම බ්ලොග් ලිපි සහ කතා සියල්ල මෙතැනින් එකම තැනකින් කියවන්න. (පිටුව ${currentPage})`;
+
+const base_url = (config?.site?.base_url || "").replace(/\/$/, ""); 
+const canonicalUrl = `${base_url}/page/${currentPage}`;
+
+// SEO Pagination Links (Google Bot එක පිටු අතර නිවැරදිව හුවමාරු වීමට)
+const prevUrl = currentPage === 2 ? `${base_url}/` : `${base_url}/page/${currentPage - 1}`;
+const nextUrl = currentPage < totalPages ? `${base_url}/page/${currentPage + 1}` : null;
+
+// ⚡ SEO BEST PRACTICE: සෙවුම් යන්ත්‍ර වලට Pagination පිටු 2, 3 නිවැරදිව ලැයිස්තුගත කිරීමට අවසර දීම
+const robotsMeta = "index, follow";
 ---
 
-<Base>
+<Base
+  title={metaTitle}
+  description={metaDescription}
+  canonical={canonicalUrl}
+  prev={prevUrl}
+  next={nextUrl}
+  robots={robotsMeta}
+>
+  {/* 100% Original Section Layout structure */}
   <section class="section">
     <div class="container">
-      <Posts className="mb-16" posts={currentPosts} />
-      <Pagination totalPages={totalPages} currentPage={currentPage} />
+      {currentPosts && currentPosts.length > 0 ? (
+        <Posts className="mb-16" posts={currentPosts} />
+      ) : (
+        // Original Style එක වෙනස් නොකර දත්ත නොමැති විට පෙන්වන කොටස
+        <div class="py-12 text-center opacity-60">
+          <p>ලිපි කිසිවෙකු හමුනොවීය.</p>
+        </div>
+      )}
+      
+      {totalPages > 1 && (
+        <Pagination totalPages={totalPages} currentPage={currentPage} />
+      )}
     </div>
   </section>
 </Base>
