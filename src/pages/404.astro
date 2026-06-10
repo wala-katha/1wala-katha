@@ -1,19 +1,67 @@
 ---
 import Base from "@/layouts/Base.astro";
+import config from "@/config/config.json";
+
+// 📈 1. SEO BEST PRACTICE: 404 පිටු සෙවුම් යන්ත්‍ර වල ලැයිස්තුගත වීම වැළැක්වීම (Critical SEO Fix)
+const robotsMeta = "noindex, nofollow";
+
+const metaTitle = `පිටුව සොයාගත නොහැකි විය - 404 Error | ${config?.site?.title || "Wala Katha"}`;
+const metaDescription = "ඔබ සොයන පිටුව දැනට අප වෙබ් අඩවියේ නොමැත. කරුණාකර ප්‍රධාන පිටුව වෙත පිවිසෙන්න.";
 ---
 
-<Base title="Page Not Found">
+<Base 
+  title={metaTitle} 
+  description={metaDescription} 
+  robots={robotsMeta}
+>
+  {/* 100% Original Section Layout structure */}
   <section class="section">
     <div class="container">
+      {/* 100% Original Flex Box Alignment */}
       <div class="flex h-[40vh] items-center justify-center">
         <div class="text-center">
-          <h1 class="h2 md:h1 mb-4">Error 404</h1>
+          
+          {/* 100% Original Error Heading - කළු පසුබිමේ රතු/තැඹිලි පැහැයෙන් ඉස්මතු කර ඇත */}
+          <h1 class="h2 md:h1 mb-4 text-red-500 dark:text-red-400 drop-shadow-[0_2px_10px_rgba(239,68,68,0.2)]">
+            Error 404
+          </h1>
+          
+          {/* 100% Original Content Div */}
           <div class="content">
-            <p>Page Not Found</p>
+            {/* සිංහල සහ ඉංග්‍රීසි භාෂා දෙකෙන්ම පැහැදිලිව පෙන්වීම (UI Enhancement) */}
+            <p class="text-text font-medium text-lg">
+              පිටුව සොයාගත නොහැකි විය / Page Not Found
+            </p>
+            
+            {/* ⚡ ස්මාර්ට් ඉස්මතු කිරීම (Smart Countdown UI): තත්පර ගණන සජීවීව වෙනස් වන කොටස */}
+            <p class="mt-4 text-sm text-slate-400 dark:text-slate-400">
+              තත්පර <span id="countdown" class="text-amber-500 dark:text-amber-400 font-bold text-base bg-amber-500/10 px-2 py-0.5 rounded mx-1">10</span> කින් ඔබව ස්වයංක්‍රීයව මුල් පිටුවට රැගෙන යනු ඇත.
+            </p>
           </div>
+          
+          {/* 100% Original Button Link with same classes */}
           <a href="/" class="btn btn-primary mt-8">Back to home</a>
+          
         </div>
       </div>
     </div>
   </section>
+
+  {/* ⚡ SMART REDIRECT SCRIPT: බ්‍රවුසර් එක ඇතුළත Countdown එක ක්‍රියාත්මක කරවන සැහැල්ලු ජාවාස්ක්‍රිප්ට් එක */}
+  <script is:inline>
+    let secondsLeft = 10; // මුල් පිටුවට යාමට ගතවන කාලය (තත්පර වලින්)
+    const countdownElement = document.getElementById('countdown');
+
+    const interval = setInterval(() => {
+      secondsLeft--;
+      if (countdownElement) {
+        countdownElement.textContent = secondsLeft;
+      }
+
+      if (secondsLeft <= 0) {
+        clearInterval(interval);
+        window.location.href = '/'; // ස්වයංක්‍රීයව Home එකට Redirect කිරීම
+      }
+    }, 1000);
+  </script>
 </Base>
