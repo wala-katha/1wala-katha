@@ -1,11 +1,15 @@
 ---
 import Base from "@/layouts/Base.astro";
+import config from "@/config/config.json"; // 📈 SEO සහ Canonical URL සඳහා Config ගොනුව සම්බන්ධ කළා
 import { getSinglePage } from "@/lib/contentParser.astro";
 import { markdownify } from "@/lib/utils/textConverter";
 import { render } from "astro:content";
 
 export async function getStaticPaths() {
   const pages = await getSinglePage("pages");
+
+  // ස්වයංක්‍රීය නිවැරදි කිරීම (Auto-Fix): Pages ලැයිස්තුව හිස් නම් බිල්ඩ් එක Fail වීම වළක්වයි
+  if (!pages || pages.length === 0) return [];
 
   const paths = pages.map((page) => ({
     params: {
@@ -17,8 +21,35 @@ export async function getStaticPaths() {
 }
 
 const { page } = Astro.props;
+
+// 1. දත්ත හිස් නම් සිදුවන සයිට් ක්‍රෑෂ් (Crash) වැළැක්වීම (Auto-Fix)
+if (!page || !page.data) {
+  return Astro.redirect("/404");
+}
+
 const { title, meta_title, description, image } = page.data;
 const { Content } = await render(page);
+
+// 📈 2. SEO ප්‍රශස්තකරණය: Canonical URL එක Trailing Slashes බග් එක නැතිව පිරිසිදුව සැකසීම
+const base_url = (config?.site?.base_url || "").replace(/\/$/, ""); 
+const canonicalUrl = `${base_url}/${page.id}`;
+
+// 🚀 GOOGLE SEO WEBPAGE SCHEMA: සෙවුම් යන්ත්‍ර වලට මෙම ස්ථාවර පිටුවල දත්ත නිවැරදිව වටහා දීමට (JSON-LD)
+const webpageSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": title || "",
+  "description": description || "",
+  "url": canonicalUrl,
+  "publisher": {
+    "@type": "Organization",
+    "name": config?.site?.title || "Wala Katha",
+    "logo": {
+      "@type": "ImageObject",
+      "url": `${base_url}/images/logo.png`
+    }
+  }
+};
 ---
 
 <Base
@@ -26,13 +57,23 @@ const { Content } = await render(page);
   meta_title={meta_title}
   description={description}
   image={image}
+  canonical={canonicalUrl}
 >
+  {/* Google Structured Data / Rich Snippet එක ඇතුළත් කිරීම */}
+  <script type="application/ld+json" set:html={JSON.stringify(webpageSchema)} />
+
+  {/* 100% Original Section Layout structure */}
   <section class="section">
     <div class="container">
-      <h1 set:html={markdownify(title)} class="h2 page-heading" />
-      <div class="content">
+      
+      {/* 100% Original Title Structure */}
+      <h1 set:html={markdownify(title || "")} class="h2 page-heading" />
+      
+      {/* 100% Original Content Wrapper (Dark Mode Typography ප්‍රශස්තකරණය සමඟ) */}
+      <div class="content text-text dark:text-slate-200 prose dark:prose-invert max-w-none">
         <Content />
       </div>
+      
     </div>
   </section>
 </Base>
