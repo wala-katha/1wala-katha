@@ -4,7 +4,7 @@ import Base from "@/layouts/Base.astro";
 import { markdownify } from "@/lib/utils/textConverter";
 import type { CollectionEntry } from "astro:content";
 import { getEntry } from "astro:content";
-import { BiSpreadsheet, BiEnvelope, BiPhoneCall, BiXCircle } from "react-icons/bi"; 
+import { BiSpreadsheet, BiEnvelope, BiPhoneCall, BiXCircle, BiCheckCircle } from "react-icons/bi"; // ⚡ සාර්ථක පණිවිඩය සඳහා BiCheckCircle එක් කළා
 
 const entry = (await getEntry(
   "contact",
@@ -15,7 +15,6 @@ if (!entry || !entry.data) {
   return Astro.redirect("/404");
 }
 
-const { contact_form_action } = config.params;
 const { address, email, phone } = config.contactinfo;
 const { title, description, meta_title, image } = entry.data;
 
@@ -83,17 +82,28 @@ const contactPageSchema = {
         </div>
         
         <div class="sm:col-7 md:col-8">
+          {/* ⚡ SMART NOTICE BOX: පණිවිඩය සාර්ථකව ගිය විට පෙන්වන ලස්සන ස්තුති කිරීමේ කොටස */}
+          <div id="form-success-alert" class="hidden mb-6 p-4 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-start text-emerald-400">
+            <BiCheckCircle className="h-6 w-6 mr-3 flex-shrink-0 mt-0.5" />
+            <div>
+              <p class="font-bold text-lg">පණිවිඩය සාර්ථකව ලැබුණා!</p>
+              <p class="text-sm opacity-90 mt-1">අප හා සම්බන්ධ වීම පිළිබඳව ස්තුතියි. ඔබගේ විමසීමට හැකි ඉක්මනින් පිළිතුරු සපයන්නෙමු.</p>
+            </div>
+          </div>
+
+          {/* Form Action එක Formspree වෙතට කෙලින්ම සම්බන්ධ කළා */}
           <form
+            id="smart-contact-form"
             class="contact-form row gy-3 justify-center"
             method="POST"
-            action={contact_form_action}
+            action="https://formspree.io/f/xanygbbz"
           >
-            {/* Name Input Container */}
-            <div class="lg:col-6">
+            {/* Name Input */}
+            <div class="lg:col-6 relative">
               <label class="mb-2 block text-text dark:text-slate-300 font-medium text-sm" for="name">
                 Name <span class="text-red-600">*</span>
               </label>
-              <div class="js-form-group relative flex items-center">
+              <div class="relative flex items-center">
                 <input
                   class="form-input w-full rounded-lg bg-white dark:bg-white border border-border focus:border-primary focus:ring-1 focus:ring-primary pr-10"
                   style="color: #000000 !important; font-weight: 700 !important; font-size: 16px !important;"
@@ -101,18 +111,18 @@ const contactPageSchema = {
                   type="text"
                   required
                 />
-                <button type="button" class="clear-btn absolute right-3 text-gray-400 hover:text-red-500 hidden z-10">
-                  <BiXCircle class="h-5 w-5 pointer-events-none" />
+                <button type="button" class="clear-btn absolute right-3 text-gray-400 hover:text-red-500 hidden transition-all">
+                  <BiXCircle class="h-5 w-5" />
                 </button>
               </div>
             </div>
 
-            {/* Email Input Container */}
-            <div class="lg:col-6">
+            {/* Email Input */}
+            <div class="lg:col-6 relative">
               <label class="mb-2 block text-text dark:text-slate-300 font-medium text-sm" for="email">
                 Email <span class="text-red-600">*</span>
               </label>
-              <div class="js-form-group relative flex items-center">
+              <div class="relative flex items-center">
                 <input
                   class="form-input w-full rounded-lg bg-white dark:bg-white border border-border focus:border-primary focus:ring-1 focus:ring-primary pr-10"
                   style="color: #000000 !important; font-weight: 700 !important; font-size: 16px !important;"
@@ -120,34 +130,34 @@ const contactPageSchema = {
                   type="email"
                   required
                 />
-                <button type="button" class="clear-btn absolute right-3 text-gray-400 hover:text-red-500 hidden z-10">
-                  <BiXCircle class="h-5 w-5 pointer-events-none" />
+                <button type="button" class="clear-btn absolute right-3 text-gray-400 hover:text-red-500 hidden transition-all">
+                  <BiXCircle class="h-5 w-5" />
                 </button>
               </div>
             </div>
 
-            {/* Subject Input Container */}
-            <div class="col-12">
+            {/* Subject Input */}
+            <div class="col-12 relative">
               <label class="mb-2 block text-text dark:text-slate-300 font-medium text-sm" for="subject">Subject</label>
-              <div class="js-form-group relative flex items-center">
+              <div class="relative flex items-center">
                 <input 
                   class="form-input w-full rounded-lg bg-white dark:bg-white border border-border focus:border-primary focus:ring-1 focus:ring-primary pr-10" 
                   style="color: #000000 !important; font-weight: 700 !important; font-size: 16px !important;"
                   name="subject" 
                   type="text" 
                 />
-                <button type="button" class="clear-btn absolute right-3 text-gray-400 hover:text-red-500 hidden z-10">
-                  <BiXCircle class="h-5 w-5 pointer-events-none" />
+                <button type="button" class="clear-btn absolute right-3 text-gray-400 hover:text-red-500 hidden transition-all">
+                  <BiXCircle class="h-5 w-5" />
                 </button>
               </div>
             </div>
 
-            {/* Message Textarea Container */}
-            <div class="col-12">
+            {/* Message Input */}
+            <div class="col-12 relative">
               <label class="mb-2 block text-text dark:text-slate-300 font-medium text-sm" for="message">
                 Message <span class="text-red-600">*</span>
               </label>
-              <div class="js-form-group relative flex items-center">
+              <div class="relative">
                 <textarea 
                   class="form-textarea w-full rounded-lg bg-white dark:bg-white border border-border focus:border-primary focus:ring-1 focus:ring-primary pr-10" 
                   style="color: #000000 !important; font-weight: 700 !important; font-size: 16px !important;"
@@ -155,15 +165,14 @@ const contactPageSchema = {
                   rows="4" 
                   required
                 ></textarea>
-                <button type="button" class="clear-btn absolute right-3 top-3 text-gray-400 hover:text-red-500 hidden z-10">
-                  <BiXCircle class="h-5 w-5 pointer-events-none" />
+                <button type="button" class="clear-btn absolute right-3 top-3 text-gray-400 hover:text-red-500 hidden transition-all">
+                  <BiXCircle class="h-5 w-5" />
                 </button>
               </div>
             </div>
 
-            {/* Submit Button */}
             <div class="col-12">
-              <button type="submit" class="btn btn-primary mt-2 transition duration-300 hover:shadow-lg hover:shadow-primary/20 w-full sm:w-auto">
+              <button id="submit-btn" class="btn btn-primary mt-2 transition duration-300 hover:shadow-lg hover:shadow-primary/20 w-full sm:w-auto">
                 Submit Now
               </button>
             </div>
@@ -173,18 +182,21 @@ const contactPageSchema = {
     </div>
   </section>
 
-  {/* ⚡ SMART INPUT FUNCTIONALITY (100% FIXED): නිවැරදිව ටයිප් කරන විට ❌ පෙන්වීමට සහ මැකීමට */}
+  {/* ⚡ SMART FUNCTIONALITY: AJAX Form Submit & Clear Buttons */}
   <script is:inline>
     document.addEventListener("DOMContentLoaded", () => {
-      const groups = document.querySelectorAll(".js-form-group");
+      const form = document.getElementById("smart-contact-form");
+      const successAlert = document.getElementById("form-success-alert");
+      const submitBtn = document.getElementById("submit-btn");
+      const formContainers = document.querySelectorAll(".relative");
 
-      groups.forEach(group => {
-        const input = group.querySelector(".form-input, .form-textarea");
-        const clearBtn = group.querySelector(".clear-btn");
+      // 1. Inputs ලියද්දී ❌ බටන් එක වැඩ කරවන කොටස
+      formContainers.forEach(container => {
+        const input = container.querySelector(".form-input, .form-textarea");
+        const clearBtn = container.querySelector(".clear-btn");
 
         if (!input || !clearBtn) return;
 
-        // ටයිප් කරන විට ❌ බටන් එක පෙන්වීම/සැඟවීම
         input.addEventListener("input", () => {
           if (input.value.length > 0) {
             clearBtn.classList.remove("hidden");
@@ -193,14 +205,56 @@ const contactPageSchema = {
           }
         });
 
-        // ❌ බටන් එක ක්ලික් කළ විට අකුරු මැකී යාම
-        clearBtn.addEventListener("click", (e) => {
-          e.preventDefault(); // ෆෝම් එක සබ්මිට් වීම සම්පූර්ණයෙන්ම වළක්වයි
+        clearBtn.addEventListener("click", () => {
           input.value = "";
           clearBtn.classList.add("hidden");
-          input.focus(); 
+          input.focus();
         });
       });
+
+      // 2. SMART AJAX SUBMIT: සයිට් එක Reload නොවී පණිවිඩය යැවීම සහ Notice එක පෙන්වීම
+      if (form) {
+        form.addEventListener("submit", async (e) => {
+          e.preventDefault(); // Default Page Reload එක නවත්වයි
+          
+          if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Sending...";
+          }
+
+          const data = new FormData(form);
+          
+          try {
+            const response = await fetch(form.action, {
+              method: form.method,
+              body: data,
+              headers: {
+                'Accept': 'application/json'
+              }
+            });
+
+            if (response.ok) {
+              // සාර්ථක නම් Alert එක පෙන්වා Form එක Clear කරයි
+              if (successAlert) {
+                successAlert.classList.remove("hidden");
+                successAlert.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              }
+              form.reset();
+              // සියලුම ❌ බටන් සඟවන්න
+              document.querySelectorAll(".clear-btn").forEach(btn => btn.classList.add("hidden"));
+            } else {
+              alert("පණිවිඩය යැවීමේදී ගැටලුවක් ඇතිවිය. කරුණාකර නැවත උත්සාහ කරන්න.");
+            }
+          } catch (error) {
+            alert("ජාල සම්බන්ධතා දෝෂයක්. කරුණාකර අන්තර්ජාලය පරීක්ෂා කරන්න.");
+          } finally {
+            if (submitBtn) {
+              submitBtn.disabled = false;
+              submitBtn.textContent = "Submit Now";
+            }
+          }
+        });
+      }
     });
   </script>
 </Base>
