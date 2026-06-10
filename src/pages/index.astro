@@ -6,95 +6,58 @@ import Pagination from "@/layouts/components/Pagination.astro";
 import FeaturedSlider from "@/layouts/components/FeaturedSlider.astro";
 import { getSinglePage } from "@/lib/contentParser.astro";
 import { sortByDate } from "@/lib/utils/sortFunctions";
-import { BiTimeFive, BiCategoryAlt, BiTrendingUp } from "react-icons/bi";
 
 const posts = await getSinglePage("posts");
 const sortedPosts = sortByDate(posts);
 const totalPages = Math.ceil(posts.length / config.settings.pagination);
 const currentPosts = sortedPosts.slice(0, config.settings.pagination);
 
-// SEO සඳහා සයිට් එකේ Canonical URL එක සකස් කිරීම
+// 🎯 SEO උපරිම කිරීමට නිල URL එක සහ ප්‍රධාන තොරතුරු සකස් කිරීම
 const base_url = (config?.site?.base_url || "").replace(/\/$/, "");
-const canonicalUrl = `${base_url}`;
+const canonicalUrl = base_url;
 
-// 🎯 ADVANCED SEO: මුල් පිටුව සඳහා Google Rich Snippets (Schema.org)
+// 🚀 ADVANCED SEO: ගූගල් රොබෝලාට සයිට් එකේ ව්‍යුහය එක පාරින්ම වටහා දෙන නිල WebSite Schema එක
 const homePageSchema = {
   "@context": "https://schema.org",
-  "@type": "CollectionPage",
-  "name": "සිංහල වල් කතා | Sinhala Wal Katha & Wela Katha Stories",
-  "description": "නවතම සහ රසවත්ම සිංහල වල් කතා (Sinhala Wal Katha) සහ වැල කථා කියවන්න ලංකාවේ අංක 1 අඩවිය.",
+  "@type": "WebSite",
+  "name": config?.site?.title || "Wala Katha",
+  "alternateName": ["සිංහල වල් කතා", "Sinhala Wal Katha", "Wela Katha"],
   "url": canonicalUrl,
-  "about": {
-    "@type": "Thing",
-    "name": "Sinhala Stories"
+  "description": "නවතම සිංහල වල් කතා සහ වැල කතා කියවන්න. Sinhala wal katha stories and high quality digital updates.",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": {
+      "@type": "EntryPoint",
+      "urlTemplate": `${base_url}/search?q={search_term_string}`
+    },
+    "query-input": "required name=search_term_string"
   }
 };
 ---
 
 <Base 
   title="සිංහල වල් කතා | Sinhala Wal Katha & Wela Katha Stories"
-  description="නවතම සහ රසවත්ම සිංහල වල් කතා (Sinhala Wal Katha), වැල කථා සහ රසකතා දිනපතා කියවන්න. ලංකාවේ විශාලතම කතා එකතුව මෙතැනින්."
+  description="නවතම සිංහල වල් කතා, වැල කතා සහ රසවත් කෙටි කතා එකතුවක් එකම තැනකින් කියවන්න. Daily updated Sinhala wal katha and wela stories."
   canonical={canonicalUrl}
 >
+  {/* JSON-LD ව්‍යුහාත්මක දත්ත මුලින්ම ඇතුළත් කිරීම */}
   <script type="application/ld+json" set:html={JSON.stringify(homePageSchema)} />
 
-  <section class="section pt-4 bg-body dark:bg-darkmode-body">
+  {/* ⚡ TRUE DARK BACKGROUND FOR THE WHOLE PAGE (පෙනුම වෙනස් නොකර පසුබිම පමණක් කළු කරයි) */}
+  <section class="section pt-4 min-h-screen bg-neutral-950 text-slate-100 dark:bg-neutral-950 dark:text-slate-100 selection:bg-primary selection:text-white">
     <div class="container">
       
-      {/* 🚀 SEO & UI HEADER: සඟවන්නේ නැතිව කළු පසුබිමේ ලස්සනට කැපී පෙනෙන ප්‍රධාන H1 Heading එක */}
-      <div class="text-center mb-8 mt-2">
-        <h1 class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 tracking-wide drop-shadow-md">
-          සිංහල වල් කතා
-        </h1>
-        <p class="text-sm md:text-base text-text/60 dark:text-slate-400 mt-2 font-medium">
-          Sinhala Wal Katha & Wela Katha Stories - නවතම කතා එකතුව
-        </p>
-        <div class="w-24 h-1 bg-gradient-to-r from-emerald-500 to-teal-500 mx-auto mt-4 rounded-full shadow-lg shadow-emerald-500/20"></div>
-      </div>
+      {/* 🚀 CRITICAL SEO FIX: සර්ච් එන්ජින් වලට පමණක් පෙනෙන, කියවීමට පහසු ප්‍රධාන H1 මාතෘකාව */}
+      <h1 class="sr-only">සිංහල වල් කතා | Sinhala Wal Katha & Wela Katha Stories - නවතම කතා එකතුව</h1>
 
-      {/* 📸 FEATURED SLIDER: ඔටෝ මාරු වෙන පින්තූර කැට ඇනිමේෂන් ස්ලයිඩරය */}
-      <div class="mb-10 rounded-2xl overflow-hidden border border-border/10 dark:border-slate-800/40 shadow-2xl">
-        <FeaturedSlider posts={sortedPosts} />
-      </div>
-
-      {/* ⚡ INTERACTIVE CATEGORY QUICK LINKS: කළු පසුබිම පාලු නැති කරන Quick Filter Navigation එක */}
-      <div class="mb-10">
-        <div class="flex items-center space-x-2 mb-4 text-text dark:text-slate-200">
-          <BiCategoryAlt className="h-5 w-5 text-emerald-400" />
-          <h2 class="text-lg font-bold">ප්‍රධාන වර්ගීකරණයන්</h2>
-        </div>
-        <div class="flex flex-wrap gap-2.5">
-          <a href="/categories/අම්මා" class="px-4 py-2 text-sm font-bold rounded-xl bg-white dark:bg-slate-900 border border-border/40 dark:border-slate-800 text-text/80 dark:text-slate-300 hover:border-emerald-500 dark:hover:border-emerald-500 hover:text-emerald-400 transition-all duration-300 shadow-sm">👩 අම්මා කතා</a>
-          <a href="/categories/නංගි" class="px-4 py-2 text-sm font-bold rounded-xl bg-white dark:bg-slate-900 border border-border/40 dark:border-slate-800 text-text/80 dark:text-slate-300 hover:border-emerald-500 dark:hover:border-emerald-500 hover:text-emerald-400 transition-all duration-300 shadow-sm">👧 නංගි කතා</a>
-          <a href="/categories/අක්කා" class="px-4 py-2 text-sm font-bold rounded-xl bg-white dark:bg-slate-900 border border-border/40 dark:border-slate-800 text-text/80 dark:text-slate-300 hover:border-emerald-500 dark:hover:border-emerald-500 hover:text-emerald-400 transition-all duration-300 shadow-sm">👩‍🦰 අක්කා කතා</a>
-          <a href="/categories/නැන්දා" class="px-4 py-2 text-sm font-bold rounded-xl bg-white dark:bg-slate-900 border border-border/40 dark:border-slate-800 text-text/80 dark:text-slate-300 hover:border-emerald-500 dark:hover:border-emerald-500 hover:text-emerald-400 transition-all duration-300 shadow-sm">👵 නැන්දා කතා</a>
-          <a href="/categories/රස-කතා" class="px-4 py-2 text-sm font-bold rounded-xl bg-white dark:bg-slate-900 border border-border/40 dark:border-slate-800 text-text/80 dark:text-slate-300 hover:border-emerald-500 dark:hover:border-emerald-500 hover:text-emerald-400 transition-all duration-300 shadow-sm">🔥 කෙටි රස කතා</a>
-        </div>
-      </div>
-
-      <hr class="border-border/30 dark:border-slate-800/60 my-8" />
-
-      {/* 📝 POSTS SECTION HEADER */}
-      <div class="flex items-center justify-between mb-6">
-        <div class="flex items-center space-x-2 text-text dark:text-slate-100">
-          <BiTimeFive className="h-5 w-5 text-teal-400 animate-pulse" />
-          <h2 class="text-xl font-bold tracking-tight">ਨවතම කථා එකතුව (Latest Stories)</h2>
-        </div>
-        <div class="flex items-center space-x-1 text-xs font-semibold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
-          <BiTrendingUp class="h-3.5 w-3.5" />
-          <span>Live Updates</span>
-        </div>
-      </div>
+      {/* පෝස්ට් ලිස්ට් එකට ඉහළින් ඔටෝ මාරු වෙන පින්තූර කැට ඇනිමේෂන් ස්ලයිඩරය */}
+      <FeaturedSlider posts={sortedPosts} />
 
       {/* ප්‍රධාන පෝස්ට් ලිස්ට් එක (ග්‍රිඩ් එක) */}
-      <div class="dark:text-slate-100">
-        <Posts posts={currentPosts} className="mb-12" />
-      </div>
+      <Posts posts={currentPosts} className="mb-16" />
       
       {/* පිටු මාරු කරන පටිය (Pagination) */}
-      <div class="mt-4 mb-8">
-        <Pagination currentPage={1} totalPages={totalPages} />
-      </div>
+      <Pagination currentPage={1} totalPages={totalPages} />
       
     </div>
   </section>
