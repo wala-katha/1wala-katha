@@ -1,10 +1,11 @@
+
 ---
 import config from "@/config/config.json";
 import Base from "@/layouts/Base.astro";
 import { markdownify } from "@/lib/utils/textConverter";
 import type { CollectionEntry } from "astro:content";
 import { getEntry } from "astro:content";
-import { BiSpreadsheet, BiEnvelope, BiPhoneCall, BiXCircle, BiCheckCircle } from "react-icons/bi";
+import { BiSpreadsheet, BiEnvelope, BiPhoneCall } from "react-icons/bi";
 
 const entry = (await getEntry(
   "contact",
@@ -18,10 +19,9 @@ if (!entry || !entry.data) {
 const { address, phone } = config.contactinfo;
 const { title, description, meta_title, image } = entry.data;
 
-// ඔබගේ නිල ජීමේල් ලිපිනය මෙහි ස්ථාවර කර ඇත
 const targetEmail = "walkatha.com@gmail.com";
 
-const base_url = (config?.site?.base_url || "").replace(/\/$/, ""); 
+const base_url = (config?.site?.base_url || "").replace(/\/$/, "");
 const canonicalUrl = `${base_url}/contact`;
 
 const contactPageSchema = {
@@ -83,105 +83,184 @@ const contactPageSchema = {
             </li>
           </ul>
         </div>
-        
+
         <div class="sm:col-7 md:col-8">
-          {/* ⚡ SMART NOTICE BOX: පණිවිඩය සාර්ථකව සෙන්ට් වූ පසු සජීවීව පෙන්වන කොටස */}
-          <div id="form-success-alert" class="hidden mb-6 p-4 rounded-lg bg-emerald-500/20 border border-emerald-500 flex items-start text-emerald-400">
-            <BiCheckCircle className="h-6 w-6 mr-3 flex-shrink-0 mt-0.5 text-emerald-400" />
-            <div>
-              <p class="font-bold text-lg text-emerald-400">පණිවිඩය සාර්ථකව ලැබුණා!</p>
-              <p class="text-sm opacity-90 mt-1 text-emerald-300">අප හා සම්බන්ධ වීම පිළිබඳව ස්තුතියි. ඔබගේ විමසීමට හැකි ඉක්මනින් පිළිතුරු සපයන්නෙමු.</p>
+          <!-- FIX 3: flex class හිදී hidden override වීම වළකන්නට
+               inline-flex + hidden භාවිතා නොකර, JS වලින් display toggle කරයි -->
+          <div
+            id="form-success-alert"
+            class="hidden mb-6 p-4 rounded-lg bg-emerald-500/20 border border-emerald-500"
+            role="alert"
+            aria-live="polite"
+          >
+            <div class="flex items-start text-emerald-400">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div>
+                <p class="font-bold text-lg text-emerald-400">පණිවිඩය සාර්ථකව ලැබුණා!</p>
+                <p class="text-sm opacity-90 mt-1 text-emerald-300">
+                  අප හා සම්බන්ධ වීම පිළිබඳව ස්තුතියි. ඔබගේ විමසීමට හැකි ඉක්මනින් පිළිතුරු සපයන්නෙමු.
+                </p>
+              </div>
             </div>
           </div>
 
-          {/* Cloudflare Pages වලින් Background එකේම Direct සෙන්ට් වෙන සැබෑ API Form එක */}
+          <div
+            id="form-error-alert"
+            class="hidden mb-6 p-4 rounded-lg bg-red-500/20 border border-red-500"
+            role="alert"
+            aria-live="polite"
+          >
+            <div class="flex items-start text-red-400">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div>
+                <p class="font-bold text-lg text-red-400">දෝෂයක් ඇතිවිය!</p>
+                <p id="form-error-message" class="text-sm opacity-90 mt-1 text-red-300"></p>
+              </div>
+            </div>
+          </div>
+
           <form
             id="smart-contact-form"
             class="contact-form row gy-3 justify-center"
-            method="POST"
-            action="https://api.web3forms.com/submit"
+            novalidate
           >
-            {/* 🎯 සෘජුවම ඔබගේ walkatha.com@gmail.com ලිපිනය හඳුනා ගන්නා නිවැරදි API Key එක */}
+            <!-- FIX 7: replyto — user email reply address ලෙස set කිරීමට JS වලින් handle කෙරේ -->
             <input type="hidden" name="access_key" value="003975ba-3b03-4f93-b68a-cf872bc9776d" />
-            <input type="hidden" name="from_name" value="Wala Katha System" />
-            <input type="checkbox" name="botcheck" class="hidden" style="display: none;" />
+            <input type="hidden" name="from_name" value="Wala Katha Contact Form" />
+            <!-- FIX 6: redirect_to — success redirect page නිශ්චිත කිරීම -->
+            <input type="hidden" name="redirect" value="false" />
+            <!-- Honeypot spam protection -->
+            <input type="checkbox" name="botcheck" class="hidden" style="display: none;" tabindex="-1" autocomplete="off" />
 
-            {/* Name Input */}
-            <div class="lg:col-6 relative">
+            <!-- FIX 1: id attributes add කිරීම — label for="" සමඟ match කිරීමට -->
+            <div class="lg:col-6 contact-field-wrap">
               <label class="mb-2 block text-text dark:text-slate-300 font-medium text-sm" for="name">
-                Name <span class="text-red-600">*</span>
+                නම <span class="text-red-500" aria-hidden="true">*</span>
               </label>
               <div class="relative flex items-center">
                 <input
+                  id="name"
                   class="form-input w-full rounded-lg bg-white border border-border focus:border-primary focus:ring-1 focus:ring-primary pr-10 text-black placeholder-gray-400"
                   style="color: #000000 !important; font-weight: 700 !important; font-size: 16px !important; background-color: #ffffff !important;"
                   name="name"
                   type="text"
+                  placeholder="ඔබගේ නම"
                   required
+                  autocomplete="name"
                 />
-                <button type="button" class="clear-btn absolute right-3 text-gray-500 hover:text-red-500 hidden transition-all z-10">
-                  <BiXCircle class="h-5 w-5" />
+                <!-- FIX 2: class → className නොව, Astro .astro files වල HTML class භාවිතා කළ යුතු -->
+                <!-- නමුත් React component නොවන බැවින් SVG icon inline use කරයි -->
+                <button
+                  type="button"
+                  class="clear-btn absolute right-3 text-gray-500 hover:text-red-500 hidden transition-all z-10"
+                  aria-label="Clear name field"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
                 </button>
               </div>
+              <p class="field-error hidden mt-1 text-xs text-red-500">නම ඇතුළත් කරන්න.</p>
             </div>
 
-            {/* Email Input */}
-            <div class="lg:col-6 relative">
+            <div class="lg:col-6 contact-field-wrap">
               <label class="mb-2 block text-text dark:text-slate-300 font-medium text-sm" for="email">
-                Email <span class="text-red-600">*</span>
+                විද්‍යුත් තැපෑල <span class="text-red-500" aria-hidden="true">*</span>
               </label>
               <div class="relative flex items-center">
                 <input
+                  id="email"
                   class="form-input w-full rounded-lg bg-white border border-border focus:border-primary focus:ring-1 focus:ring-primary pr-10 text-black placeholder-gray-400"
                   style="color: #000000 !important; font-weight: 700 !important; font-size: 16px !important; background-color: #ffffff !important;"
                   name="email"
                   type="email"
+                  placeholder="you@example.com"
                   required
+                  autocomplete="email"
                 />
-                <button type="button" class="clear-btn absolute right-3 text-gray-500 hover:text-red-500 hidden transition-all z-10">
-                  <BiXCircle class="h-5 w-5" />
+                <button
+                  type="button"
+                  class="clear-btn absolute right-3 text-gray-500 hover:text-red-500 hidden transition-all z-10"
+                  aria-label="Clear email field"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
                 </button>
               </div>
+              <p class="field-error hidden mt-1 text-xs text-red-500">වලංගු විද්‍යුත් තැපැල් ලිපිනයක් ඇතුළත් කරන්න.</p>
             </div>
 
-            {/* Subject Input */}
-            <div class="col-12 relative">
-              <label class="mb-2 block text-text dark:text-slate-300 font-medium text-sm" for="subject">Subject</label>
-              <div class="relative flex items-center">
-                <input 
-                  class="form-input w-full rounded-lg bg-white border border-border focus:border-primary focus:ring-1 focus:ring-primary pr-10 text-black placeholder-gray-400" 
-                  style="color: #000000 !important; font-weight: 700 !important; font-size: 16px !important; background-color: #ffffff !important;"
-                  name="subject" 
-                  type="text" 
-                />
-                <button type="button" class="clear-btn absolute right-3 text-gray-500 hover:text-red-500 hidden transition-all z-10">
-                  <BiXCircle class="h-5 w-5" />
-                </button>
-              </div>
-            </div>
-
-            {/* Message Input */}
-            <div class="col-12 relative">
-              <label class="mb-2 block text-text dark:text-slate-300 font-medium text-sm" for="message">
-                Message <span class="text-red-600">*</span>
+            <!-- FIX 5: Subject — empty submission වළකන්නට default subject JS වලින් inject කෙරේ -->
+            <div class="col-12 contact-field-wrap">
+              <label class="mb-2 block text-text dark:text-slate-300 font-medium text-sm" for="subject">
+                විෂය
               </label>
-              <div class="relative">
-                <textarea 
-                  class="form-textarea w-full rounded-lg bg-white border border-border focus:border-primary focus:ring-1 focus:ring-primary pr-10 text-black placeholder-gray-400" 
+              <div class="relative flex items-center">
+                <input
+                  id="subject"
+                  class="form-input w-full rounded-lg bg-white border border-border focus:border-primary focus:ring-1 focus:ring-primary pr-10 text-black placeholder-gray-400"
                   style="color: #000000 !important; font-weight: 700 !important; font-size: 16px !important; background-color: #ffffff !important;"
-                  name="message" 
-                  rows="4" 
+                  name="subject"
+                  type="text"
+                  placeholder="ඔබගේ විමසීමේ විෂය"
+                  autocomplete="off"
+                />
+                <button
+                  type="button"
+                  class="clear-btn absolute right-3 text-gray-500 hover:text-red-500 hidden transition-all z-10"
+                  aria-label="Clear subject field"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="col-12 contact-field-wrap">
+              <label class="mb-2 block text-text dark:text-slate-300 font-medium text-sm" for="message">
+                පණිවිඩය <span class="text-red-500" aria-hidden="true">*</span>
+              </label>
+              <!-- FIX 4: textarea selector — form-input class add කිරීම JS selector එකට match වෙන්නට -->
+              <div class="relative">
+                <textarea
+                  id="message"
+                  class="form-input w-full rounded-lg bg-white border border-border focus:border-primary focus:ring-1 focus:ring-primary pr-10 text-black placeholder-gray-400"
+                  style="color: #000000 !important; font-weight: 700 !important; font-size: 16px !important; background-color: #ffffff !important;"
+                  name="message"
+                  rows="4"
+                  placeholder="ඔබගේ පණිවිඩය මෙහි ලියන්න..."
                   required
                 ></textarea>
-                <button type="button" class="clear-btn absolute right-3 top-3 text-gray-500 hover:text-red-500 hidden transition-all z-10">
-                  <BiXCircle class="h-5 w-5" />
+                <button
+                  type="button"
+                  class="clear-btn absolute right-3 top-3 text-gray-500 hover:text-red-500 hidden transition-all z-10"
+                  aria-label="Clear message field"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
                 </button>
               </div>
+              <p class="field-error hidden mt-1 text-xs text-red-500">පණිවිඩය ඇතුළත් කරන්න.</p>
             </div>
 
             <div class="col-12">
-              <button id="submit-btn" class="btn btn-primary mt-2 transition duration-300 hover:shadow-lg hover:shadow-primary/20 w-full sm:w-auto">
-                Submit Now
+              <button
+                id="submit-btn"
+                type="submit"
+                class="btn btn-primary mt-2 transition duration-300 hover:shadow-lg hover:shadow-primary/20 w-full sm:w-auto disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                <span id="submit-btn-text">Submit Now</span>
+                <svg id="submit-spinner" xmlns="http://www.w3.org/2000/svg" class="hidden animate-spin h-4 w-4 ml-2 inline" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                </svg>
               </button>
             </div>
           </form>
@@ -190,27 +269,32 @@ const contactPageSchema = {
     </div>
   </section>
 
-  {/* ⚡ SMART REAL-TIME SUBMIT LOGIC */}
   <script is:inline>
     document.addEventListener("DOMContentLoaded", () => {
       const form = document.getElementById("smart-contact-form");
       const successAlert = document.getElementById("form-success-alert");
+      const errorAlert = document.getElementById("form-error-alert");
+      const errorMessage = document.getElementById("form-error-message");
       const submitBtn = document.getElementById("submit-btn");
-      const formContainers = document.querySelectorAll(".relative");
+      const submitBtnText = document.getElementById("submit-btn-text");
+      const submitSpinner = document.getElementById("submit-spinner");
 
-      // Inputs ලියද්දී ❌ බටන් පාලනය
-      formContainers.forEach(container => {
-        const input = container.querySelector(".form-input, .form-textarea");
-        const clearBtn = container.querySelector(".clear-btn");
+      // FIX 4: Unified selector — form-input class textarea සහ input දෙකටම apply වේ
+      const fieldWraps = document.querySelectorAll(".contact-field-wrap");
+
+      fieldWraps.forEach(wrap => {
+        const input = wrap.querySelector(".form-input");
+        const clearBtn = wrap.querySelector(".clear-btn");
+        const fieldError = wrap.querySelector(".field-error");
 
         if (!input || !clearBtn) return;
 
+        // Clear button toggle on input
         input.addEventListener("input", () => {
-          if (input.value.length > 0) {
-            clearBtn.classList.remove("hidden");
-          } else {
-            clearBtn.classList.add("hidden");
-          }
+          clearBtn.classList.toggle("hidden", input.value.length === 0);
+          // Validate on type — error hide on input
+          if (fieldError) fieldError.classList.add("hidden");
+          input.classList.remove("border-red-500");
         });
 
         clearBtn.addEventListener("click", (e) => {
@@ -221,25 +305,79 @@ const contactPageSchema = {
         });
       });
 
-      // 🎯 සැබෑ BACKGROUND AJAX SUBMISSION: කිසිදු ඇප් එකක් ඕපන් නොකර කෙලින්ම සෙන්ට් කිරීම
+      // Alert hide helper
+      function hideAlerts() {
+        successAlert.classList.add("hidden");
+        errorAlert.classList.add("hidden");
+      }
+
+      // Field validation
+      function validateForm() {
+        let valid = true;
+
+        const nameInput = document.getElementById("name");
+        const emailInput = document.getElementById("email");
+        const messageInput = document.getElementById("message");
+
+        // Name
+        const nameWrap = nameInput.closest(".contact-field-wrap");
+        const nameError = nameWrap.querySelector(".field-error");
+        if (!nameInput.value.trim()) {
+          nameInput.classList.add("border-red-500");
+          nameError.classList.remove("hidden");
+          valid = false;
+        }
+
+        // Email
+        const emailWrap = emailInput.closest(".contact-field-wrap");
+        const emailError = emailWrap.querySelector(".field-error");
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailInput.value.trim() || !emailRegex.test(emailInput.value.trim())) {
+          emailInput.classList.add("border-red-500");
+          emailError.classList.remove("hidden");
+          valid = false;
+        }
+
+        // Message
+        const messageWrap = messageInput.closest(".contact-field-wrap");
+        const messageError = messageWrap.querySelector(".field-error");
+        if (!messageInput.value.trim()) {
+          messageInput.classList.add("border-red-500");
+          messageError.classList.remove("hidden");
+          valid = false;
+        }
+
+        return valid;
+      }
+
       if (form) {
         form.addEventListener("submit", async (e) => {
           e.preventDefault();
-          
-          if (submitBtn) {
-            submitBtn.disabled = true;
-            submitBtn.textContent = "Sending...";
-          }
+          hideAlerts();
+
+          if (!validateForm()) return;
+
+          // Submit button loading state
+          submitBtn.disabled = true;
+          submitBtnText.textContent = "යවමින්...";
+          submitSpinner.classList.remove("hidden");
 
           const formData = new FormData(form);
-          
-          // Web3Forms API එකට ගැළපෙන පරිදි FormData එක JSON Object එකක් බවට පරිවර්තනය කිරීම
           const object = {};
-          formData.forEach((value, key) => { object[key] = value });
+          formData.forEach((value, key) => { object[key] = value; });
+
+          // FIX 5: Subject empty නම් default subject inject කිරීම
+          if (!object["subject"] || !object["subject"].trim()) {
+            object["subject"] = "Wala Katha - නව සම්බන්ධතා පණිවිඩය";
+          }
+
+          // FIX 7: replyto — user email reply address ලෙස set කිරීම
+          object["replyto"] = object["email"];
+
           const json = JSON.stringify(object);
-          
+
           try {
-            const response = await fetch(form.action, {
+            const response = await fetch("https://api.web3forms.com/submit", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
@@ -250,24 +388,26 @@ const contactPageSchema = {
 
             const result = await response.json();
 
-            if (response.status === 200 && result.success) {
-              // සාර්ථක නම් ඊමේල් ඇප් ඇහෙන්නේ නැතුව සයිට් එක ඇතුළෙන්ම Notice එක පෙන්වයි
-              if (successAlert) {
-                successAlert.classList.remove("hidden");
-                successAlert.scrollIntoView({ behavior: "smooth", block: "center" });
-              }
+            if (response.ok && result.success) {
+              // FIX 3: flex + hidden conflict නැත — JS වලින් display control
+              successAlert.classList.remove("hidden");
+              successAlert.scrollIntoView({ behavior: "smooth", block: "nearest" });
               form.reset();
               document.querySelectorAll(".clear-btn").forEach(btn => btn.classList.add("hidden"));
+              document.querySelectorAll(".form-input").forEach(input => input.classList.remove("border-red-500"));
             } else {
-              alert("පණිවිඩය යැවීමේදී දෝෂයක් ඇතිවිය: " + (result.message || "කරුණාකර නැවත උත්සාහ කරන්න."));
+              errorMessage.textContent = result.message || "කරුණාකර නැවත උත්සාහ කරන්න.";
+              errorAlert.classList.remove("hidden");
+              errorAlert.scrollIntoView({ behavior: "smooth", block: "nearest" });
             }
           } catch (error) {
-            alert("ජාල සම්බන්ධතා දෝෂයක් ඇතිවිය. කරුණාකර අන්තර්ජාලය පරීක්ෂා කරන්න.");
+            errorMessage.textContent = "ජාල සම්බන්ධතා දෝෂයක් ඇතිවිය. කරුණාකර අන්තර්ජාලය පරීක්ෂා කරන්න.";
+            errorAlert.classList.remove("hidden");
+            errorAlert.scrollIntoView({ behavior: "smooth", block: "nearest" });
           } finally {
-            if (submitBtn) {
-              submitBtn.disabled = false;
-              submitBtn.textContent = "Submit Now";
-            }
+            submitBtn.disabled = false;
+            submitBtnText.textContent = "Submit Now";
+            submitSpinner.classList.add("hidden");
           }
         });
       }
