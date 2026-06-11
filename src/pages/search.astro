@@ -1,5 +1,6 @@
 ---
 import SearchBar from "@/helpers/SearchBar";
+import config from "@/config/config.json";
 import Base from "@/layouts/Base.astro";
 import { getSinglePage } from "@/lib/contentParser.astro";
 
@@ -12,12 +13,120 @@ const searchList = posts.map((item) => ({
   data: item.data,
   content: item.body,
 }));
+
+// 🎯 SEO සහ Canonical URL සැකසුම්
+const base_url = (config?.site?.base_url || "").replace(/\/$/, "");
+const canonicalUrl = `${base_url}/search`;
+const siteLogo = `${base_url}/images/logo.png`;
+
+// 🚀 2026 SEARCH PAGE SPECIFIC SCHEMA (Google Rich Snippets සඳහා)
+const searchPageSchema = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "SearchActionPage",
+      "@id": `${canonicalUrl}/#searchpage`,
+      "url": canonicalUrl,
+      "name": "සර්ච් කරන්න | Search Stories - Wala Katha",
+      "description": "ඔබට අවශ්‍ය සියලුම සිංහල වල් කතා සහ වැල කතා නම හෝ Keywords මඟින් පහසුවෙන් සොයා ගන්න.",
+      "isPartOf": { "@id": `${base_url}/#website` }
+    }
+  ]
+};
 ---
 
-<Base title={`Search`}>
-  <section class="section">
+<Base 
+  title="සර්ච් කරන්න | Search Sinhala Wal Katha & Wela Stories"
+  meta_title="සර්ච් කරන්න | Search Stories - WalaKatha"
+  description="ඔබට අවශ්‍ය සියලුම සිංහල වල් කතා සහ වැල කතා නම හෝ Keywords මඟින් ඉතා ඉක්මනින් සර්ච් කර ලබා ගන්න."
+  canonical={canonicalUrl}
+  image={siteLogo}
+>
+  {/* JSON-LD ව්‍යුහාත්මක දත්ත */}
+  <script type="application/ld+json" set:html={JSON.stringify(searchPageSchema)} />
+
+  {/* ⚡ PREMIUM ULTRA-DARK BACKGROUND & SEARCH INITIALIZER */}
+  <style is:inline>
+    html, body {
+      background-color: #050505 !important;
+      color: #f8fafc !important;
+    }
+
+    /* 🔍 Search Input Box එක අඳුරු පසුබිමට ගැලපීම සහ ඉස්මතු කිරීම */
+    input[type="search"], input[type="text"], .search-input, :global(#search-input) {
+      background-color: #0d0d0d !important;
+      border: 2px solid #1a1a1a !important;
+      color: #ffffff !important;
+      font-weight: 700 !important;
+      font-size: 16px !important;
+      border-radius: 12px !important;
+      padding: 12px 20px !important;
+      transition: all 0.3s ease !important;
+    }
+
+    /* Search Box එක ක්ලික් කළ විට එන ලස්සන Emerald Glow එක */
+    input[type="search"]:focus, input[type="text"]:focus, :global(#search-input:focus) {
+      border-color: #10b981 !important;
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.25) !important;
+      outline: none !important;
+    }
+
+    /* 🧩 සර්ච් ප්‍රතිඵල වල එන පෝස්ට් කාඩ්ස් (Cards) ස්ටයිල් */
+    :global(.post-card), :global(.card), :global(.search-result-item) {
+      background-color: #0d0d0d !important;
+      border: 1px solid #1a1a1a !important;
+      border-radius: 14px !important;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+
+    /* කාඩ්ස් උඩින් යද්දී Emerald Glow එකක් ඒම */
+    :global(.post-card:hover), :global(.card:hover), :global(.search-result-item:hover) {
+      background-color: #121212 !important;
+      border-color: rgba(16, 185, 129, 0.4) !important;
+      transform: translateY(-3px) !important;
+      box-shadow: 0 10px 25px -10px rgba(16, 185, 129, 0.25) !important;
+    }
+
+    /* අකුරු වල පැහැදිලි බව (Contrast) උපරිම කිරීම */
+    :global(.search-result-item h3), :global(.search-result-item a), :global(.post-card h3 a) {
+      color: #ffffff !important;
+      font-weight: 700 !important;
+    }
+
+    :global(.search-result-item a:hover), :global(.post-card h3 a:hover) {
+      color: #34d399 !important;
+    }
+
+    :global(.search-result-item p), :global(.text-muted) {
+      color: #cbd5e1 !important;
+    }
+
+    /* 🎯 100% PENALTY-FREE HIDDEN H1 STYLE (Google Safe Pattern) */
+    .invisible-seo-h1 {
+      position: absolute !important;
+      width: 1px !important;
+      height: 1px !important;
+      padding: 0 !important;
+      margin: -1px !important;
+      overflow: hidden !important;
+      clip: rect(0, 0, 0, 0) !important;
+      white-space: nowrap !important;
+      border: 0 !important;
+    }
+  </style>
+
+  <main class="section pt-6 pb-12 min-h-screen bg-[#050505] antialiased">
     <div class="container">
+      
+      {/* මිනිස් ඇසට නොපෙනෙන, නමුත් Google සර්ච් රොබෝවරුන් කැමතිම H1 සැකසුම */}
+      <div class="invisible-seo-h1">
+        <h1>සිංහල වල් කතා සර්ච් ලිස්ට් එක | Search Sinhala Wal Katha Stories</h1>
+        <p>Wala Katha වෙබ් අඩවියේ ඇති සියලුම කතා මෙතැනින් සර්ච් කර සොයා ගන්න.</p>
+      </div>
+
+      {/* සජීවීව ක්‍රියාත්මක වන Search Component එක */}
       <SearchBar client:load searchList={searchList} />
+      
     </div>
-  </section>
+  </main>
 </Base>
