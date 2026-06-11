@@ -17,39 +17,54 @@ const base_url = (config?.site?.base_url || "").replace(/\/$/, "");
 const canonicalUrl = base_url;
 const siteLogo = `${base_url}/images/logo.png`; 
 
-// 🚀 ADVANCED SEO: නිල WebSite Schema එක (Search Action සහ Keywords සමඟ)
+// 🚀 ADVANCED INTEGRATED SCHEMA 2026 (Penalty-Free Structure)
 const homePageSchema = {
   "@context": "https://schema.org",
-  "@type": "WebSite",
-  "name": config?.site?.title || "Wala Katha",
-  "alternateName": [
-    "සිංහල වල් කතා", 
-    "Sinhala Wal Katha", 
-    "Wela Katha", 
-    "Wal Katha", 
-    "Wala Katha Stories", 
-    "Sinhala Wela Katha",
-    "අලුත්ම වල් කතා"
-  ],
-  "url": canonicalUrl,
-  "description": "අලුත්ම සහ රසවත්ම සිංහල වල් කතා සහ වැල කතා කියවන්න. Daily updated high quality Sinhala wal katha stories, wela katha and digital updates.",
-  "image": siteLogo,
-  "publisher": {
-    "@type": "Organization",
-    "name": config?.site?.title || "Wala Katha",
-    "logo": {
-      "@type": "ImageObject",
-      "url": siteLogo
-    }
-  },
-  "potentialAction": {
-    "@type": "SearchAction",
-    "target": {
-      "@type": "EntryPoint",
-      "urlTemplate": `${base_url}/?search={search_term_string}`
+  "@graph": [
+    {
+      "@type": "CollectionPage",
+      "@id": `${canonicalUrl}/#collection`,
+      "url": canonicalUrl,
+      "name": "සිංහල වල් කතා එකතුව | Latest Stories",
+      "description": "Daily updated Sinhala wal katha and wela stories collection.",
+      "about": {
+        "@type": "Thing",
+        "name": "Sinhala Literature & Stories"
+      }
     },
-    "query-input": "required name=search_term_string"
-  }
+    {
+      "@type": "WebSite",
+      "@id": `${base_url}/#website`,
+      "url": base_url,
+      "name": config?.site?.title || "Wala Katha",
+      "alternateName": [
+        "සිංහල වල් කතා", 
+        "Sinhala Wal Katha", 
+        "Wela Katha", 
+        "Wal Katha", 
+        "Wala Katha Stories", 
+        "Sinhala Wela Katha",
+        "අලුත්ම වල් කතා"
+      ],
+      "description": "අලුත්ම සහ රසවත්ම සිංහල වල් කතා සහ වැල කතා කියවන්න. Daily updated high quality Sinhala wal katha stories, wela katha and digital updates.",
+      "publisher": {
+        "@type": "Organization",
+        "name": config?.site?.title || "Wala Katha",
+        "logo": {
+          "@type": "ImageObject",
+          "url": siteLogo
+        }
+      },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": `${base_url}/?search={search_term_string}`
+        },
+        "query-input": "required name=search_term_string"
+      }
+    }
+  ]
 };
 ---
 
@@ -59,12 +74,25 @@ const homePageSchema = {
   description="නවතම සිංහල වල් කතා, වැල කතා, අලුත්ම කෙටි කතා සහ රසවත් කතා එකතුවක් එකම තැනකින් කියවන්න. Daily updated Sinhala wal katha and wela stories collection."
   canonical={canonicalUrl}
 >
-  {/* JSON-LD ව්‍යුහාත්මක දත්ත */}
+  {/* JSON-LD ව්‍යුහාත්මක දත්ත (Search Engine Bots හට එකවර කියවීමට) */}
   <script type="application/ld+json" set:html={JSON.stringify(homePageSchema)} />
 
-  {/* ⚡ PREMIUM ULTRA-DARK BACKGROUND & POPUP ENHANCEMENT */}
+  {/* SOCIAL INJECTOR (Facebook/Telegram Preview සඳහා Core Meta Tags) */}
+  <Fragment slot="head">
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="සිංහල වල් කතා | Sinhala Wal Katha & Wela Katha Stories" />
+    <meta property="og:description" content="නවතම සිංහල වල් කතා, වැල කතා, අලුත්ම කෙටි කතා එකතුවක් එකම තැනකින් කියවන්න." />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={siteLogo} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="සිංහල වල් කතා | Sinhala Wal Katha" />
+    <meta name="twitter:description" content="Daily updated Sinhala wal katha and wela stories collection." />
+    <meta name="twitter:image" content={siteLogo} />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  </Fragment>
+
+  {/* ⚡ PREMIUM ULTRA-DARK BACKGROUND & HIGHLIGHT ENHANCEMENT */}
   <style is:inline>
-    /* මුළු සයිට් එකම ලෝඩ් වෙද්දීම Flash නොවී කළු පසුබිම තබා ගැනීම */
     html, body {
       background-color: #050505 !important;
       color: #f8fafc !important; 
@@ -72,104 +100,83 @@ const homePageSchema = {
       font-display: swap;
     }
     
-    /* 🧩 Post Cards වල මූලික හැඩය (දැනට තියෙන Layout එක වෙනස් නොවේ) */
+    /* 🧩 Cards ස්ටයිල් බලහත්කාරයෙන් කළු කිරීම */
     :global(.post-card), :global(.card), :global(.bg-body), :global(.bg-white) {
-      background-color: #0b0c0e !important; /* වඩාත් ගැළපෙන Obsidian Black වර්ණය */
-      border: 1px solid #161b22 !important;
-      border-radius: 16px !important;
-      will-change: transform, box-shadow;
-      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), 
-                  box-shadow 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), 
-                  border-color 0.3s ease !important;
+      background-color: #0d0d0d !important;
+      border: 1px solid #1a1a1a !important;
+      border-radius: 14px !important;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
     }
     
-    /* 🔥 3D POPUP EFFECT: පෝස්ට් කාඩ් මතින් යද්දී සුමටව ඉදිරියට නෙරා ඒම (Popup) සහ Emerald Neon Glow එකක් වැදීම */
+    /* 🔥 ULTRA HIGHLIGHT EFFECT: කාඩ් උඩින් යද්දී Emerald Glow එකක් ඒම */
     :global(.post-card:hover), :global(.card:hover) {
-      background-color: #101216 !important;
-      border-color: #10b981 !important; /* Glow එකට ගැළපෙන Border එක */
-      transform: scale(1.03) translateY(-4px) !important; /* ත්‍රිමාණ ලෙස උඩට මතුවන Popup ස්ටයිල් එක */
-      box-shadow: 0 20px 40px -15px rgba(16, 185, 129, 0.35), 
-                  0 0 25px -5px rgba(16, 185, 129, 0.15) !important;
-      z-index: 10;
+      background-color: #121212 !important;
+      border-color: rgba(16, 185, 129, 0.4) !important;
+      transform: translateY(-4px) !important;
+      box-shadow: 0 10px 25px -10px rgba(16, 185, 129, 0.25) !important;
     }
     
-    /* අකුරු ඉස්මතු කිරීම සහ වර්ණ ගැළපීම */
+    /* අකුරු වල පැහැදිලි බව ඉස්මතු කිරීම */
     :global(.post-card-title), :global(.post-card h3), :global(.post-card h3 a), :global(.post-card a) {
       color: #ffffff !important;
-      font-weight: 700 !important;
       transition: color 0.2s ease !important;
     }
     
-    /* Hover වෙද්දී Title එක Emerald වර්ණයෙන් දිලිසීම */
-    :global(.post-card:hover h3 a), :global(.post-card:hover a) {
+    :global(.post-card h3 a:hover), :global(.post-card a:hover) {
       color: #34d399 !important;
     }
     
     :global(.post-card p), :global(.text-muted) {
-      color: #94a3b8 !important; /* කියවීමට පහසු Slate Text */
+      color: #a3a3a3 !important;
     }
 
-    /* Layout Shift බග් එක මඟහැරවූ සුමට Image Hover Effect */
     :global(.featured-slider img), :global(.post-card img) {
-      transition: transform 0.5s ease, filter 0.3s ease !important;
-      border-radius: 12px !important;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+      border-radius: 10px !important;
+    }
+    :global(.featured-slider img:hover), :global(.post-card img:hover) {
+      filter: brightness(1.1) !important;
     }
     
-    /* කාඩ් එක Hover වෙද්දී ඉමේජ් එකත් සුදුවී ලස්සනට Zoom වීම */
-    :global(.post-card:hover img) {
-      transform: scale(1.02) !important;
-      filter: brightness(1.1) contrast(1.05) !important;
-    }
-    
-    /* සිංහල ෆොන්ට් Render වීම වඩාත් පැහැදිලි කිරීම */
     p, h1, h2, h3, h4, a, span {
       text-rendering: optimizeLegibility !important;
       -webkit-font-smoothing: antialiased !important;
-      -moz-osx-font-smoothing: grayscale !important;
     }
 
-    /* Pagination Buttons အඳුරු තීමට ගැළපීම */
+    /* Pagination Buttons අඳුරු පසුබිමට ගැළපීම */
     :global(.pagination a) {
-      background-color: #0b0c0e !important;
-      border: 1px solid #161b22 !important;
-      color: #e2e8f0 !important;
-      border-radius: 8px !important;
-      transition: all 0.2s ease !important;
+      background-color: #0d0d0d !important;
+      border: 1px solid #262626 !important;
+      color: #e5e5e5 !important;
     }
     :global(.pagination a:hover), :global(.pagination .active a) {
       background-color: #10b981 !important;
       color: #050505 !important;
       border-color: #10b981 !important;
-      box-shadow: 0 0 15px rgba(16, 185, 129, 0.4) !important;
     }
 
-    /* Slider එකෙහි කළු පසුබිම් Gradient එක පිරිසිදු කිරීම */
     :global(.featured-slider .slider-content) {
-      background: linear-gradient(to top, rgba(5,5,5,1) 0%, rgba(5,5,5,0.5) 60%, transparent 100%) !important;
+      background: linear-gradient(to top, rgba(5,5,5,0.95) 0%, rgba(5,5,5,0.4) 70%, transparent 100%) !important;
     }
-    
-    /* Tags සහ Badges වල වර්ණ පද්ධතිය */
     :global(.tag), :global(.category-badge) {
       background-color: rgba(16, 185, 129, 0.1) !important;
       color: #34d399 !important;
       border: 1px solid rgba(16, 185, 129, 0.2) !important;
-      padding: 4px 10px !important;
-      border-radius: 6px !important;
     }
   </style>
 
-  {/* පසුබිම් තීම් එක සහ සිලෙක්ෂන් කලර්ස් */}
-  <section class="section pt-4 pb-12 min-h-screen bg-[#050505] text-slate-200 selection:bg-emerald-500 selection:text-neutral-950 tracking-wide leading-relaxed antialiased">
+  {/* ප්‍රධාන සෙක්ෂන් එක */}
+  <main class="section pt-4 pb-12 min-h-screen bg-[#050505] text-slate-200 selection:bg-emerald-500 selection:text-neutral-950 antialiased">
     <div class="container">
       
-      {/* 🚀 PERFECT SEO HIDDEN BLOCK: 
-          පරිශීලකයාට පිටුව ඇතුළත දර්ශනය නොවේ, නමුත් Google බොට්ස් ලා H1 මාතෘකාව සම්පූර්ණයෙන්ම කියවයි. */}
+      {/* 🚀 2026 PENALTY-FREE HIDDEN H1 BLOCK 
+          සාමාන්‍ය මිනිස් ඇසට නොපෙනෙන නමුත් Google බොට්ස්ලාට 100% කියවිය හැකි නිවැරදි Tailwind ක්‍රමය */}
       <div class="sr-only">
-        <h1>සිංහල වල් katha</h1>
-        <p>Sinhala Wal Katha & Wela Katha Stories - නවතම කතා එකතුව</p>
+        <h1>සිංහල වල් කතා | Sinhala Wal Katha Stories</h1>
+        <p>නවතම සිංහල වල් කතා, වැල කතා, සහ කෙටි රසවත් කතා එකතුව.</p>
       </div>
 
-      {/* Slider එක */}
+      {/* Slider එක ඉහළින්ම මනාව දර්ශනය වේ */}
       <FeaturedSlider posts={sortedPosts} />
 
       {/* ප්‍රධාන පෝස්ට් ග්‍රිඩ් එක */}
@@ -179,5 +186,5 @@ const homePageSchema = {
       <Pagination currentPage={1} totalPages={totalPages} />
       
     </div>
-  </section>
+  </main>
 </Base>
