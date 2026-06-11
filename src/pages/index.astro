@@ -62,7 +62,7 @@ const homePageSchema = {
   {/* JSON-LD ව්‍යුහාත්මක දත්ත */}
   <script type="application/ld+json" set:html={JSON.stringify(homePageSchema)} />
 
-  {/* ⚡ PREMIUM ULTRA-DARK BACKGROUND & HIGHLIGHT ENHANCEMENT */}
+  {/* ⚡ PREMIUM ULTRA-DARK BACKGROUND & POPUP ENHANCEMENT */}
   <style is:inline>
     /* මුළු සයිට් එකම ලෝඩ් වෙද්දීම Flash නොවී කළු පසුබිම තබා ගැනීම */
     html, body {
@@ -72,44 +72,53 @@ const homePageSchema = {
       font-display: swap;
     }
     
-    /* 🧩 Astro Components ඇතුළත ඇති Cards වලට :global එක මඟින් ස්ටයිල් බලහත්කාරයෙන් කැවීම */
+    /* 🧩 Post Cards වල මූලික හැඩය (දැනට තියෙන Layout එක වෙනස් නොවේ) */
     :global(.post-card), :global(.card), :global(.bg-body), :global(.bg-white) {
-      background-color: #0d0d0d !important;
-      border: 1px solid #1a1a1a !important;
-      border-radius: 14px !important;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+      background-color: #0b0c0e !important; /* වඩාත් ගැළපෙන Obsidian Black වර්ණය */
+      border: 1px solid #161b22 !important;
+      border-radius: 16px !important;
+      will-change: transform, box-shadow;
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                  box-shadow 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                  border-color 0.3s ease !important;
     }
     
-    /* 🔥 ULTRA HIGHLIGHT EFFECT: පෝස්ට් කාඩ් මතින් යද්දී සුපිරි Emerald Glow එකක් සහ කාඩ් එක මදක් මතුවීම */
+    /* 🔥 3D POPUP EFFECT: පෝස්ට් කාඩ් මතින් යද්දී සුමටව ඉදිරියට නෙරා ඒම (Popup) සහ Emerald Neon Glow එකක් වැදීම */
     :global(.post-card:hover), :global(.card:hover) {
-      background-color: #121212 !important;
-      border-color: rgba(16, 185, 129, 0.5) !important;
-      transform: translateY(-5px) !important;
-      box-shadow: 0 12px 30px -10px rgba(16, 185, 129, 0.3) !important;
+      background-color: #101216 !important;
+      border-color: #10b981 !important; /* Glow එකට ගැළපෙන Border එක */
+      transform: scale(1.03) translateY(-4px) !important; /* ත්‍රිමාණ ලෙස උඩට මතුවන Popup ස්ටයිල් එක */
+      box-shadow: 0 20px 40px -15px rgba(16, 185, 129, 0.35), 
+                  0 0 25px -5px rgba(16, 185, 129, 0.15) !important;
+      z-index: 10;
     }
     
     /* අකුරු ඉස්මතු කිරීම සහ වර්ණ ගැළපීම */
     :global(.post-card-title), :global(.post-card h3), :global(.post-card h3 a), :global(.post-card a) {
       color: #ffffff !important;
+      font-weight: 700 !important;
       transition: color 0.2s ease !important;
     }
     
-    :global(.post-card h3 a:hover), :global(.post-card a:hover) {
+    /* Hover වෙද්දී Title එක Emerald වර්ණයෙන් දිලිසීම */
+    :global(.post-card:hover h3 a), :global(.post-card:hover a) {
       color: #34d399 !important;
     }
     
     :global(.post-card p), :global(.text-muted) {
-      color: #a3a3a3 !important;
+      color: #94a3b8 !important; /* කියවීමට පහසු Slate Text */
     }
 
     /* Layout Shift බග් එක මඟහැරවූ සුමට Image Hover Effect */
     :global(.featured-slider img), :global(.post-card img) {
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-      border-radius: 10px !important;
+      transition: transform 0.5s ease, filter 0.3s ease !important;
+      border-radius: 12px !important;
     }
-    :global(.featured-slider img:hover), :global(.post-card img:hover) {
-      box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.4) !important;
-      filter: brightness(1.15) !important;
+    
+    /* කාඩ් එක Hover වෙද්දී ඉමේජ් එකත් සුදුවී ලස්සනට Zoom වීම */
+    :global(.post-card:hover img) {
+      transform: scale(1.02) !important;
+      filter: brightness(1.1) contrast(1.05) !important;
     }
     
     /* සිංහල ෆොන්ට් Render වීම වඩාත් පැහැදිලි කිරීම */
@@ -119,27 +128,33 @@ const homePageSchema = {
       -moz-osx-font-smoothing: grayscale !important;
     }
 
-    /* Pagination Buttons අඳුරු තීම් එකට ගැළපීම */
+    /* Pagination Buttons အඳුරු තීමට ගැළපීම */
     :global(.pagination a) {
-      background-color: #0d0d0d !important;
-      border: 1px solid #262626 !important;
-      color: #e5e5e5 !important;
+      background-color: #0b0c0e !important;
+      border: 1px solid #161b22 !important;
+      color: #e2e8f0 !important;
+      border-radius: 8px !important;
       transition: all 0.2s ease !important;
     }
     :global(.pagination a:hover), :global(.pagination .active a) {
       background-color: #10b981 !important;
       color: #050505 !important;
       border-color: #10b981 !important;
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.4) !important;
     }
 
-    /* 🔥 ADDITIONAL DARK HIGHLIGHTS FOR SLIDER & TAGS */
+    /* Slider එකෙහි කළු පසුබිම් Gradient එක පිරිසිදු කිරීම */
     :global(.featured-slider .slider-content) {
-      background: linear-gradient(to top, rgba(5,5,5,0.95) 0%, rgba(5,5,5,0.4) 70%, transparent 100%) !important;
+      background: linear-gradient(to top, rgba(5,5,5,1) 0%, rgba(5,5,5,0.5) 60%, transparent 100%) !important;
     }
+    
+    /* Tags සහ Badges වල වර්ණ පද්ධතිය */
     :global(.tag), :global(.category-badge) {
-      background-color: #164e63/30 !important;
-      color: #22d3ee !important;
-      border: 1px solid rgba(34, 211, 238, 0.2) !important;
+      background-color: rgba(16, 185, 129, 0.1) !important;
+      color: #34d399 !important;
+      border: 1px solid rgba(16, 185, 129, 0.2) !important;
+      padding: 4px 10px !important;
+      border-radius: 6px !important;
     }
   </style>
 
@@ -150,11 +165,11 @@ const homePageSchema = {
       {/* 🚀 PERFECT SEO HIDDEN BLOCK: 
           පරිශීලකයාට පිටුව ඇතුළත දර්ශනය නොවේ, නමුත් Google බොට්ස් ලා H1 මාතෘකාව සම්පූර්ණයෙන්ම කියවයි. */}
       <div class="sr-only">
-        <h1>සිංහල වල් කතා</h1>
+        <h1>සිංහල වල් katha</h1>
         <p>Sinhala Wal Katha & Wela Katha Stories - නවතම කතා එකතුව</p>
       </div>
 
-      {/* Slider එක (දැන් මෙය සයිට් එකේ ඉහළින්ම පිරිසිදුව දිස්වේ) */}
+      {/* Slider එක */}
       <FeaturedSlider posts={sortedPosts} />
 
       {/* ප්‍රධාන පෝස්ට් ග්‍රිඩ් එක */}
