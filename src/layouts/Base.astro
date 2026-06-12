@@ -14,7 +14,6 @@ const fontEntries = Object.entries(theme.fonts.font_family).filter(
   ([key]) => !key.includes("_type"),
 );
 
-// types for frontmatters
 export interface Props {
   title?: string;
   meta_title?: string;
@@ -24,10 +23,8 @@ export interface Props {
   canonical?: string;
 }
 
-// distructure frontmatters
 const { title, meta_title, description, image, noindex, canonical } = Astro.props;
 
-// --- 🧠 100% ACCURATE SMART SEO AUTO-FILL LOGIC ---
 const calculatedTitle = plainify(
   meta_title && meta_title.trim() !== "" 
     ? meta_title 
@@ -42,17 +39,17 @@ const calculatedDescription = plainify(
     : config.metadata.meta_description
 );
 
-// Auto-fill Keywords for Search Engines
 const siteKeywords = "Wal Katha, wala katha, wela katha, walkatha, සිංහල වැල කතා, sinhala wal katha, Wela kathaa, Sex Katha, Sex Stories, Wal Stories, Sinhala Sex, Sinhala Porn, Free Download, Sri Lanka, new wela katha, wal katha 9, sinhala wela katha, wal Katha sinhalen, Ammai Puthai, Paule wela Katha, Sinhala wal wala wela katha, amma katha, family katha, suparima katha, walma, wal katha kari katha, eha gedara, akka katha, malli katha, seeya katha, husband katha, wife katha, hora katha, New Wal Katha blogs, wal chithra katha, wal katha free, sinhala sex katha, sinhala wal katha blog, nangita hukala, campus, amma malli, akka, birinda, wife lingika paula, rasama, rasa wal katha";
 
-// Dynamic Canonical URL calculation safely avoiding double slashes
 const cleanBaseUrl = config.site.base_url.endsWith('/') ? config.site.base_url.slice(0, -1) : config.site.base_url;
 const currentCanonical = canonical ? canonical : `${cleanBaseUrl}${Astro.url.pathname}`;
 
-// Meta Image URL clean formatting logic
 const finalImageUrl = image 
   ? (image.startsWith('http') ? image : `${cleanBaseUrl}${image.startsWith('/') ? image : '/' + image}`) 
   : `${cleanBaseUrl}${config.metadata.meta_image.startsWith('/') ? config.metadata.meta_image : '/' + config.metadata.meta_image}`;
+
+// ✅ CHECK IF CURRENT PAGE IS SEARCH: සර්ච් පිටුව හඳුනා ගැනීම
+const isSearchPage = Astro.url.pathname.includes("/search");
 ---
 
 <!doctype html>
@@ -63,16 +60,8 @@ const finalImageUrl = image
     <meta name="msapplication-TileColor" content="#010203" />
     
     <meta name="theme-color" content="#010203" />
-    <meta
-      name="theme-color"
-      media="(prefers-color-scheme: light)"
-      content="#010203"
-    />
-    <meta
-      name="theme-color"
-      media="(prefers-color-scheme: dark)"
-      content="#010203"
-    />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#010203" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#010203" />
     
     <meta name="generator" content={Astro.generator} />
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -84,10 +73,7 @@ const finalImageUrl = image
       })
     }
 
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, maximum-scale=5"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
 
     <title>{calculatedTitle}</title>
 
@@ -98,7 +84,8 @@ const finalImageUrl = image
     <meta name="description" content={calculatedDescription} />
     <meta name="keywords" content={siteKeywords} />
 
-    <ClientRouter />
+    {/* ✅ FIXED: සර්ච් පිටුවේදී පමණක් ClientRouter එක ක්‍රියාත්මක වීම වළක්වා Crash වීම සදහටම නැවැත්වීම */}
+    {!isSearchPage && <ClientRouter />}
 
     <meta name="author" content={config.metadata.meta_author} />
 
