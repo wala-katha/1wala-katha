@@ -29,13 +29,13 @@ export default function SearchBar({ searchList }: Props) {
   const [inputVal, setInputVal] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
 
-  // Safe Search List Filtering (හිස් හෝ කැඩුණු දත්ත මඟ හැරීමට)
+  // 1. දත්ත ලැයිස්තුව ආරක්ෂිතව තබා ගැනීම
   const safeSearchList = useMemo(() => {
     if (!Array.isArray(searchList)) return [];
     return searchList.filter(item => item && item.slug && item.data);
   }, [searchList]);
 
-  // Stable Fuse Instance
+  // 2. ✅ FIXED: Dependency එකක් ලෙස safeSearchList.length පමණක් යෙදීමෙන් Infinite Loops සම්පූර්ණයෙන් වළකී
   const fuse = useMemo(
     () =>
       new Fuse(safeSearchList, {
@@ -44,7 +44,7 @@ export default function SearchBar({ searchList }: Props) {
         minMatchCharLength: 2,
         threshold: 0.4,
       }),
-    [safeSearchList]
+    [safeSearchList.length]
   );
 
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,100 +59,82 @@ export default function SearchBar({ searchList }: Props) {
     });
   }, []);
 
+  // URL එකෙන් පරාමිතිය කියවීම
   useEffect(() => {
     const searchStr = new URLSearchParams(window.location.search).get("q") ?? "";
     if (searchStr) {
       setInputVal(searchStr);
-      requestAnimationFrame(() => {
-        if (inputRef.current) {
-          inputRef.current.selectionStart =
-            inputRef.current.selectionEnd = searchStr.length;
-        }
-      });
     }
-    
     requestAnimationFrame(() => {
       inputRef.current?.focus();
     });
   }, []);
 
-  // Live Search Execution
+  // 3. ✅ FIXED: [fuse] එක dependency එකෙන් ඉවත් කර Infinite Re-renders 100%ක් නැති කළා
   useEffect(() => {
     const trimmed = inputVal.trim();
     if (trimmed.length > 2) {
-      try {
-        const results = fuse.search(trimmed);
-        setSearchResults(results as SearchResult[]);
-      } catch (err) {
-        console.error("Fuse search error:", err);
-        setSearchResults([]);
-      }
+      const results = fuse.search(trimmed);
+      setSearchResults(results as SearchResult[]);
     } else {
       setSearchResults([]);
     }
-  }, [inputVal, fuse]);
+  }, [inputVal]); // 👈 fuse එක මෙතනින් ඉවත් කළා!
 
   return (
     <div className="w-full select-none relative z-50">
 
-      {/* EXIT BUTTON */}
-      <div className="max-w-2xl mx-auto flex justify-end mb-4">
-        <a
-          href="/"
-          rel="home"
-          className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-neutral-800 bg-[#0a0b0d]/60 hover:bg-neutral-800/80 text-neutral-400 hover:text-red-400 transition-all duration-300 text-sm font-semibold tracking-wide shadow-md"
-          title="Exit search and go home"
-          aria-label="Exit search and go home"
-        >
-          <span>Exit</span>
-          <IoCloseOutline className="h-5 w-5" />
-        </a>
-      </div>
-
-      {/* SEARCH INPUT BOX CONTAINER */}
-      <div className="max-w-2xl mx-auto mb-8 relative block">
-        <div className="relative flex items-center group w-full">
-
-          {/* Left Icon */}
-          <span 
-            className="absolute left-4 z-20 text-[#01AD9F] pointer-events-none transition-transform duration-300 group-focus-within:scale-110"
-            style={{ filter: "drop-shadow(0 0 8px rgba(1,173,159,0.4))" }}
+      {/* 🛡️ STATIC CONTAINER: සර්ච් බොක්ස් එක සහ Exit බටන් එක කිසිම රෙන්ඩර් එකකින් හැංගෙන්නේ නැත */}
+      <div className="w-full block">
+        {/* EXIT BUTTON */}
+        <div className="max-w-2xl mx-auto flex justify-end mb-4">
+          <a
+            href="/"
+            rel="home"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-neutral-800 bg-[#0a0b0d]/60 hover:bg-neutral-800/80 text-neutral-400 hover:text-red-400 transition-all duration-300 text-sm font-semibold tracking-wide shadow-md"
+            title="Exit search and go home"
           >
-            <IoSearchOutline className="h-6 w-6" />
-          </span>
+            <span>Exit</span>
+            <IoCloseOutline className="h-5 w-5" />
+          </a>
+        </div>
 
-          <input
-            ref={inputRef}
-            id="search-bar"
-            type="text" 
-            name="q"
-            value={inputVal}
-            onChange={handleChange}
-            placeholder="කතාවේ නම, ප්‍රවර්ගය හෝ ලේඛකයා ටයිප් කරන්න..."
-            autoComplete="off"
-            spellCheck={false}
-            aria-label="Search posts"
-            aria-autocomplete="list"
-            aria-controls="search-results-list"
-            aria-expanded={searchResults.length > 0}
-            className="search-input w-full pl-12 pr-12 py-3.5 rounded-xl border border-neutral-800 bg-[#0d0e12]/90 text-[#F8F8FF] text-[17px] font-medium outline-none transition-all duration-200 focus:border-[#01AD9F] focus:bg-[#111318]"
-            style={{
-              boxSizing: "border-box"
-            }}
-          />
-
-          {/* Clear Button */}
-          {inputVal.length > 0 && (
-            <button
-              onClick={handleClear}
-              type="button"
-              className="absolute right-4 z-20 text-neutral-500 hover:text-red-400 focus:text-red-400 transition-colors duration-200"
-              title="Clear search"
-              aria-label="Clear search"
+        {/* SEARCH INPUT BOX */}
+        <div className="max-w-2xl mx-auto mb-8 relative">
+          <div className="relative flex items-center group w-full">
+            <span 
+              className="absolute left-4 z-20 text-[#01AD9F] pointer-events-none transition-transform duration-300 group-focus-within:scale-110"
+              style={{ filter: "drop-shadow(0 0 8px rgba(1,173,159,0.4))" }}
             >
-              <IoCloseCircleOutline className="h-6 w-6" />
-            </button>
-          )}
+              <IoSearchOutline className="h-6 w-6" />
+            </span>
+
+            <input
+              ref={inputRef}
+              id="search-bar"
+              type="text" 
+              name="q"
+              value={inputVal}
+              onChange={handleChange}
+              placeholder="කතාවේ නම, ප්‍රවර්ගය හෝ ලේඛකයා ටයිප් කරන්න..."
+              autoComplete="off"
+              spellCheck={false}
+              aria-label="Search posts"
+              className="search-input w-full pl-12 pr-12 py-3.5 rounded-xl border border-neutral-800 bg-[#0d0e12]/90 text-[#F8F8FF] text-[17px] font-medium outline-none transition-all duration-200 focus:border-[#01AD9F] focus:bg-[#111318]"
+              style={{ boxSizing: "border-box" }}
+            />
+
+            {inputVal.length > 0 && (
+              <button
+                onClick={handleClear}
+                type="button"
+                className="absolute right-4 z-20 text-neutral-500 hover:text-red-400 transition-colors duration-200"
+                title="Clear search"
+              >
+                <IoCloseCircleOutline className="h-6 w-6" />
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -160,21 +142,20 @@ export default function SearchBar({ searchList }: Props) {
       {inputVal.trim().length > 2 && (
         <div
           role="status"
-          aria-live="polite"
           className="my-6 text-center text-sm sm:text-base text-neutral-400 font-medium tracking-wide block"
         >
           ප්‍රතිඵල <span className="text-[#01AD9F] font-bold">{searchResults.length}</span> ක් හමු විය: <span className="text-[#F8F8FF] font-semibold">'{inputVal}'</span>
         </div>
       )}
 
-      {/* RESULTS GRID */}
+      {/* DYNAMIC RESULTS CONTAINER */}
       <div
         id="search-results-list"
         role="list"
         className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:gap-8 clear-both"
       >
         {searchResults.map(({ item }) => {
-          // ආරක්ෂිත විචල්‍යයන් (Defensive check to strictly prevent undefined breaks)
+          if (!item?.slug) return null;
           const title = item?.data?.title ?? "Untitled Post";
           const image = item?.data?.image;
           const date = item?.data?.date;
@@ -184,14 +165,11 @@ export default function SearchBar({ searchList }: Props) {
             <article
               key={item.slug}
               role="listitem"
-              className="search-result-item group/card flex flex-col justify-between border border-neutral-800/60 bg-[#0a0b0d]/80 p-4 rounded-2xl hover:border-[#01AD9F]/30 hover:shadow-lg hover:shadow-[#01AD9F]/5 transition-all duration-300"
+              className="search-result-item group/card flex flex-col justify-between border border-neutral-800/60 bg-[#0a0b0d]/80 p-4 rounded-2xl hover:border-[#01AD9F]/30 hover:shadow-lg transition-all duration-300"
             >
               <div>
                 {image && (
-                  <a
-                    href={`/${item.slug}`}
-                    className="rounded-xl block overflow-hidden relative aspect-video w-full bg-neutral-900"
-                  >
+                  <a href={`/${item.slug}`} className="rounded-xl block overflow-hidden relative aspect-video w-full bg-neutral-900">
                     <img
                       className="group-hover/card:scale-[1.03] w-full h-full object-cover transition-transform duration-500"
                       src={image}
@@ -199,22 +177,18 @@ export default function SearchBar({ searchList }: Props) {
                       loading="lazy"
                       width={445}
                       height={230}
-                      decoding="async"
                     />
                   </a>
                 )}
 
-                {/* METADATA LIST */}
+                {/* METADATA */}
                 <ul className="mt-4 mb-2 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-neutral-400">
                   {date && (
                     <li className="flex items-center font-medium">
                       <CalendarIcon className="mr-1.5 h-4 w-4 text-[#01AD9F]" />
-                      <time dateTime={date}>
-                        {dateFormat(date)}
-                      </time>
+                      <time dateTime={date}>{dateFormat(date)}</time>
                     </li>
                   )}
-                  {/* ✅ CRITICAL CRASH PROTECTION: Array එකක්ම බව තහවුරු කර ගැනීම */}
                   {Array.isArray(categories) && categories.length > 0 && (
                     <li className="flex items-center font-medium">
                       <CategoryIcon className="mr-1.5 h-4 w-4 text-[#01AD9F]" />
@@ -237,19 +211,16 @@ export default function SearchBar({ searchList }: Props) {
                   )}
                 </ul>
 
-                {/* POST TITLE */}
-                <h3 className="mb-2 text-base sm:text-lg font-bold tracking-tight">
-                  <a
-                    href={`/${item.slug}`}
-                    className="block text-[#F8F8FF] hover:text-[#01AD9F] line-clamp-2 leading-snug transition-colors duration-200"
-                  >
+                {/* TITLE */}
+                <h3 className="mb-2 text-base sm:text-lg font-bold">
+                  <a href={`/${item.slug}`} className="block text-[#F8F8FF] hover:text-[#01AD9F] line-clamp-2 transition-colors duration-200">
                     {title}
                   </a>
                 </h3>
               </div>
 
-              {/* CONTENT SNIPPET */}
-              <p className="text-neutral-400 text-xs sm:text-sm line-clamp-2 mt-1 leading-relaxed">
+              {/* SNIPPET */}
+              <p className="text-neutral-400 text-xs sm:text-sm line-clamp-2 mt-1">
                 {item.content ?? ""}
               </p>
             </article>
@@ -259,9 +230,8 @@ export default function SearchBar({ searchList }: Props) {
 
       {/* EMPTY STATE */}
       {inputVal.trim().length > 2 && searchResults.length === 0 && (
-        <div className="text-center py-16 text-neutral-500 text-base rounded-2xl border border-neutral-900 bg-[#07080a] block clear-both">
+        <div className="text-center py-16 text-neutral-500 text-base rounded-2xl border border-neutral-900 bg-[#07080a] block">
           <p className="text-neutral-400 font-semibold">⚠️ කිසිදු ප්‍රතිඵලයක් හමු නොවීය.</p>
-          <p className="text-sm mt-1 text-neutral-500">වෙනත් වචනයක් සමඟ නැවත උත්සාහ කරන්න.</p>
         </div>
       )}
     </div>
