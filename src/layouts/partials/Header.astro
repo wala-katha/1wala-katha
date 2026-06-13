@@ -29,7 +29,7 @@ const { main }: { main: NavigationLink[] } = menu;
     {/* MOBILE MENU TOGGLE CHECKBOX */}
     <input id="nav-toggle" type="checkbox" class="hidden" />
 
-    {/* MOBILE MENU BUTTONS (🎯 FIX: Desktop වලදීත් සර්වසමව පෙන්වීමට md:hidden සහ අනෙක් බ්ලොක්ස් ඉවත් කළා) */}
+    {/* MOBILE MENU BUTTONS */}
     <label
       id="show-button"
       for="nav-toggle"
@@ -54,7 +54,7 @@ const { main }: { main: NavigationLink[] } = menu;
       </svg>
     </label>
 
-    {/* NAVIGATION MENU (🎯 FIX: Desktop වල තිරස්ව ඇදෙන md:flex සහ md:w-auto ඉවත් කර 100% මොබයිල් විදිහටම සකස් කළා) */}
+    {/* NAVIGATION MENU */}
     <ul
       id="nav-menu"
       class="navbar-nav order-3 hidden w-full text-center gap-1"
@@ -75,7 +75,7 @@ const { main }: { main: NavigationLink[] } = menu;
                   </svg>
                 </button>
                 
-                {/* 👑 SILVER ANIMATED BORDER DROPDOWN BOX (රිදී පාටින් ඉරක් දුවන කොටුව) */}
+                {/* 👑 SILVER ANIMATED BORDER DROPDOWN BOX */}
                 <div 
                   id={`dropdown-${index}`} 
                   class="nav-dropdown-list silver-animated-border hidden min-w-[220px] rounded-xl z-50 text-center mx-auto my-2"
@@ -128,7 +128,6 @@ const { main }: { main: NavigationLink[] } = menu;
     font-family: inherit;
   }
 
-  {/* 🎯 FIX: මොබයිල් වල වැඩ කරපු CSS මීඩියා ලොජික් එක (max-width: 767px) ඉවත් කර ඩෙස්ක්ටොප් එකටත් 100% එකම ලෙස ඇප්ලයි කළා */}
   .navbar-nav {
     background-color: #060709 !important;
     border: 1px solid rgba(255, 255, 255, 0.05);
@@ -151,13 +150,12 @@ const { main }: { main: NavigationLink[] } = menu;
      ========================================================== */
   .silver-animated-border {
     position: absolute;
-    padding: 1.5px; /* රිදී ඉරෙහි ඝනකම */
+    padding: 1.5px;
     overflow: hidden;
     background: rgba(255, 255, 255, 0.04);
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), 0 0 15px rgba(255, 255, 255, 0.03);
   }
 
-  /* දෙපැත්තෙන්ම සමානව ගලාගෙන යන රිදී ද්‍රව ධාරාව */
   .silver-animated-border::before {
     content: '';
     position: absolute;
@@ -183,14 +181,13 @@ const { main }: { main: NavigationLink[] } = menu;
       transform: rotate(0deg) scale(1);
     }
     50% {
-      transform: rotate(180deg) scale(1.05); /* මැදදී සියුම් ලෙස තීව්‍ර වීම */
+      transform: rotate(180deg) scale(1.05);
     }
     100% {
       transform: rotate(360deg) scale(1);
     }
   }
 
-  /* 🎯 SEO & FUNCTIONAL FIX: ඩෙස්ක්ටොප් එකේදීත් චෙක්බොක්ස් එක හරහා ❌ ලකුණ මතු වීමට සලස්වන CSS රීතිය */
   #nav-toggle:checked ~ #show-button {
     display: none !important;
   }
@@ -200,12 +197,20 @@ const { main }: { main: NavigationLink[] } = menu;
 </style>
 
 <script>
+  // ✅ ROOT FIX: Global click listener එක module-scope variable එකක ගබඩා කර,
+  // initHeaderLogic() සෑම astro:page-load වලදීත් run වෙද්දී පැරණි listener එක
+  // පළමුව ඉවත් කරයි. නැතිනම් listeners accumulate වී, search input එක click/focus
+  // කරද්දී "outside click" handler එක ක්‍රියාත්මක වී navToggle change event
+  // dispatch කරයි → cascade re-render → persisted React island reset වෙනවා.
+  let outsideClickHandler: ((e: MouseEvent) => void) | null = null;
+
   function initHeaderLogic() {
     const dropdownButtons = document.querySelectorAll(".nav-dropdown-btn");
-    const navToggle = document.getElementById("nav-toggle") as HTMLInputElement;
+    const navToggle = document.getElementById("nav-toggle") as HTMLInputElement | null;
     const headerElement = document.getElementById("site-header");
 
     dropdownButtons.forEach((btn) => {
+      // ✅ cloneNode pattern දිගටම පවතී — duplicate listeners on the button itself avoid කරයි
       const newBtn = btn.cloneNode(true) as HTMLButtonElement;
       btn.parentNode?.replaceChild(newBtn, btn);
 
@@ -216,8 +221,7 @@ const { main }: { main: NavigationLink[] } = menu;
       if (newBtn && menu) {
         newBtn.addEventListener("click", (e) => {
           e.stopPropagation();
-          
-          // අනෙක් විවෘතව ඇති ඩ්‍රොප්ඩවුන්ස් වැසීම
+
           document.querySelectorAll(".nav-dropdown-list").forEach((m) => {
             if (m.id !== targetId) {
               m.classList.add("hidden");
@@ -240,14 +244,16 @@ const { main }: { main: NavigationLink[] } = menu;
       }
     });
 
-    // 🎯 FIX: සම්පූර්ණ මෙනු එක හෝ ඩ්‍රොප්ඩවුන් එක ඇරලා තියෙද්දී පිටත ක්ලික් කළොත් ඔටෝ වැසීමේ ලොජික් එක
-    document.addEventListener("click", (e) => {
+    // ✅ FIX: පැරණි document-level listener එක තිබේ නම් පළමුව remove කරන්න
+    if (outsideClickHandler) {
+      document.removeEventListener("click", outsideClickHandler);
+      outsideClickHandler = null;
+    }
+
+    outsideClickHandler = (e: MouseEvent) => {
       const target = e.target as Node;
-      
-      // ක්ලික් එක වැදුනේ හෙඩර් එක ඇතුළේ නෙමෙයි නම් පමණක් ක්‍රියාත්මක වේ
+
       if (headerElement && !headerElement.contains(target)) {
-        
-        // 1. සියලුම ඩ්‍රොප්ඩවුන් මෙනු වසා දැමීම
         document.querySelectorAll(".nav-dropdown-list").forEach((menu) => {
           menu.classList.add("hidden");
           const parent = menu.parentElement;
@@ -255,17 +261,29 @@ const { main }: { main: NavigationLink[] } = menu;
           parent?.querySelector(".nav-dropdown-btn")?.setAttribute("aria-expanded", "false");
         });
 
-        // 2. මොබයිල් මෙනු එක ඇරලා තිබ්බොත් ඒකත් ඔටෝ වැසීම (Checkbox uncheck කිරීම)
+        // ✅ FIX: navToggle already unchecked නම් event dispatch නොකරන්න —
+        // අනවශ්‍ය "change" events ඇතිවීම නවතී (cascade re-render root cause)
         if (navToggle && navToggle.checked) {
           navToggle.checked = false;
-          const changeEvent = new Event('change');
-          navToggle.dispatchEvent(changeEvent);
+          navToggle.dispatchEvent(new Event("change"));
         }
       }
-    });
+    };
+
+    document.addEventListener("click", outsideClickHandler);
   }
 
-  // Astro Lifecycle සහ සාමාන්‍ය DOM එකට බඳින්න
+  // ✅ Astro Lifecycle — DOMContentLoaded සහ astro:page-load දෙකේදීම
+  // නමුත් දැන් cleanup logic එක නිසා listener accumulation නෑ
   document.addEventListener("DOMContentLoaded", initHeaderLogic);
   document.addEventListener("astro:page-load", initHeaderLogic);
+
+  // ✅ EXTRA SAFETY: astro:before-swap වෙද්දී listener cleanup —
+  // page transition අතරතුර stale handler trigger වීම සම්පූර්ණයෙන් වළක්වයි
+  document.addEventListener("astro:before-swap", () => {
+    if (outsideClickHandler) {
+      document.removeEventListener("click", outsideClickHandler);
+      outsideClickHandler = null;
+    }
+  });
 </script>
