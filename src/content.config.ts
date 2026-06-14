@@ -2,6 +2,7 @@ import { glob } from "astro/loaders";
 import { defineCollection } from "astro:content";
 import { z } from "astro/zod";
 
+// About collection schema
 const aboutCollection = defineCollection({
   loader: glob({ pattern: "**/-*.{md,mdx}", base: "src/content/about" }),
   schema: z.object({
@@ -21,6 +22,7 @@ const aboutCollection = defineCollection({
   }),
 });
 
+// Contact collection schema
 const contactCollection = defineCollection({
   loader: glob({ pattern: "**/-*.{md,mdx}", base: "src/content/contact" }),
   schema: z.object({
@@ -32,6 +34,7 @@ const contactCollection = defineCollection({
   }),
 });
 
+// Authors collection schema
 const authorsCollection = defineCollection({
   loader: glob({ pattern: "**/*.{md,mdx}", base: "src/content/authors" }),
   schema: z.object({
@@ -53,6 +56,7 @@ const authorsCollection = defineCollection({
   }),
 });
 
+// Posts collection schema
 const postsCollection = defineCollection({
   loader: glob({ pattern: "**/*.{md,mdx}", base: "src/content/posts" }),
   schema: z.object({
@@ -68,6 +72,7 @@ const postsCollection = defineCollection({
   }),
 });
 
+// Pages collection schema
 const pagesCollection = defineCollection({
   loader: glob({ pattern: "**/*.{md,mdx}", base: "src/content/pages" }),
   schema: z.object({
@@ -80,6 +85,7 @@ const pagesCollection = defineCollection({
   }),
 });
 
+// Export collections
 export const collections = {
   posts: postsCollection,
   about: aboutCollection,
