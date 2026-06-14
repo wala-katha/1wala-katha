@@ -1,0 +1,41 @@
+name: Optimize Author Images
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  optimize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install Sharp
+        run: npm install sharp
+      - name: Write optimizer script
+        run: |
+          cat > optimize.mjs << 'EOF'
+          import sharp from 'sharp';
+          import { readdirSync } from 'fs';
+          const dir = 'public/images/authors';
+          for (const file of readdirSync(dir)) {
+            if (/\.(jpg|jpeg|png)$/i.test(file)) {
+              const out = dir + '/' + file.replace(/\.[^.]+$/, '.webp');
+              await sharp(dir + '/' + file)
+                .resize(100, 100, { fit: 'cover' })
+                .webp({ quality: 80 })
+                .toFile(out);
+              console.log('Done:', file, '->', out);
+            }
+          }
+          EOF
+      - name: Resize author images
+        run: node optimize.mjs
+      - name: Commit optimized images
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add public/images/authors/*.webp
+          git diff --staged --quiet || git commit -m "Auto: optimize author images to WebP"
+          git push
