@@ -1,14 +1,14 @@
 import { glob } from "astro/loaders";
 import { defineCollection } from "astro:content";
 import { z } from "astro/zod";
+import { image } from "astro:content";
 
-// About collection schema
 const aboutCollection = defineCollection({
   loader: glob({ pattern: "**/-*.{md,mdx}", base: "src/content/about" }),
-  schema: z.object({
+  schema: ({ image: img }) => z.object({
     title: z.string(),
     meta_title: z.string().optional(),
-    image: z.string().optional(),
+    image: img().optional(),
     draft: z.boolean().optional(),
     what_i_do: z.object({
       title: z.string(),
@@ -22,25 +22,23 @@ const aboutCollection = defineCollection({
   }),
 });
 
-// Contact collection schema
 const contactCollection = defineCollection({
   loader: glob({ pattern: "**/-*.{md,mdx}", base: "src/content/contact" }),
-  schema: z.object({
+  schema: ({ image: img }) => z.object({
     title: z.string(),
     meta_title: z.string().optional(),
     description: z.string().optional(),
-    image: z.string().optional(),
+    image: img().optional(),
     draft: z.boolean().optional(),
   }),
 });
 
-// Authors collection schema
 const authorsCollection = defineCollection({
   loader: glob({ pattern: "**/*.{md,mdx}", base: "src/content/authors" }),
-  schema: z.object({
+  schema: ({ image: img }) => z.object({
     title: z.string(),
     meta_title: z.string().optional(),
-    image: z.string().optional(),
+    image: img().optional(),
     description: z.string().optional(),
     social: z
       .object({
@@ -56,15 +54,14 @@ const authorsCollection = defineCollection({
   }),
 });
 
-// Posts collection schema
 const postsCollection = defineCollection({
   loader: glob({ pattern: "**/*.{md,mdx}", base: "src/content/posts" }),
-  schema: z.object({
+  schema: ({ image: img }) => z.object({
     title: z.string(),
     meta_title: z.string().optional(),
     description: z.string().optional(),
     date: z.coerce.date().optional(),
-    image: z.string().optional(),
+    image: img().optional(),
     categories: z.array(z.string()).default(() => ["others"]),
     authors: z.array(z.string()).default(() => ["Admin"]),
     tags: z.array(z.string()).default(() => ["others"]),
@@ -72,20 +69,18 @@ const postsCollection = defineCollection({
   }),
 });
 
-// Pages collection schema
 const pagesCollection = defineCollection({
   loader: glob({ pattern: "**/*.{md,mdx}", base: "src/content/pages" }),
-  schema: z.object({
+  schema: ({ image: img }) => z.object({
     title: z.string(),
     meta_title: z.string().optional(),
     description: z.string().optional(),
-    image: z.string().optional(),
+    image: img().optional(),
     layout: z.string().optional(),
     draft: z.boolean().optional(),
   }),
 });
 
-// Export collections
 export const collections = {
   posts: postsCollection,
   about: aboutCollection,
