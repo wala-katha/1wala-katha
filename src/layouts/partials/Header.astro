@@ -18,69 +18,88 @@ export interface NavigationLink {
 const { main }: { main: NavigationLink[] } = menu;
 ---
 
-<header class="header pt-6">
-  <nav class="navbar container">
+{/* 👑 PREMIUM GLOSSY GLASSMORPHISM HEADER */}
+<header id="site-header" class="header sticky top-0 z-50 py-4 transition-all duration-300 border-b border-white/[0.06] bg-[#010203]/80 backdrop-blur-md shadow-[0_4px_30px_rgba(0,0,0,0.8)]">
+  <nav class="navbar container flex items-center justify-between">
+    {/* LOGO */}
     <div class="order-0">
       <Logo />
     </div>
+
+    {/* MOBILE MENU TOGGLE CHECKBOX */}
     <input id="nav-toggle" type="checkbox" class="hidden" />
+
+    {/* MOBILE MENU BUTTONS */}
     <label
       id="show-button"
       for="nav-toggle"
-      class="order-2 flex cursor-pointer items-center text-black md:order-1 md:hidden"
+      class="order-2 flex cursor-pointer items-center text-white/90 hover:text-[#01AD9F] transition-colors duration-200 p-2"
     >
-      <svg class="h-6 fill-current" viewBox="0 0 20 20">
+      <svg class="h-6 w-6 fill-current" viewBox="0 0 20 20">
         <title>Menu Open</title>
-        <path d="M0 3h20v2H0V3z m0 6h20v2H0V9z m0 6h20v2H0V0z"></path>
+        <path d="M0 3h20v2H0V3z m0 6h20v2H0V9z m0 6h20v2H0V15z"></path>
       </svg>
     </label>
+    
     <label
       id="hide-button"
       for="nav-toggle"
-      class="order-2 hidden cursor-pointer items-center text-black md:order-1"
+      class="order-2 hidden cursor-pointer items-center text-white/90 hover:text-[#01AD9F] transition-colors duration-200 p-2"
     >
-      <svg class="h-6 fill-current" viewBox="0 0 20 20">
+      <svg class="h-6 w-6 fill-current" viewBox="0 0 20 20">
         <title>Menu Close</title>
         <polygon
           points="11 9 22 9 22 11 11 11 11 22 9 22 9 11 -2 11 -2 9 9 9 9 -2 11 -2"
           transform="rotate(45 10 10)"></polygon>
       </svg>
     </label>
+
+    {/* NAVIGATION MENU */}
     <ul
       id="nav-menu"
-      class="navbar-nav order-3 hidden w-full md:order-1 md:flex md:w-auto text-center"
+      class="navbar-nav order-3 hidden w-full text-center gap-1"
     >
       {
-        main.map((menu) => (
+        main.map((menu, index) => (
           <>
             {menu.hasChildren ? (
-              <li class="nav-item nav-dropdown relative cursor-pointer flex flex-col items-center">
+              <li class="nav-item nav-dropdown relative cursor-pointer flex flex-col items-center group">
                 <button 
-                  id="dropdown-btn"
-                  class="nav-link flex items-center justify-center gap-1 w-auto bg-transparent border-none outline-none cursor-pointer mx-auto"
+                  class="nav-dropdown-btn nav-link flex items-center justify-center gap-1 w-auto bg-transparent border-none outline-none cursor-pointer mx-auto text-white/80 hover:text-[#01AD9F] font-semibold py-2 px-4 transition duration-200"
                   aria-expanded="false"
+                  data-dropdown-target={`dropdown-${index}`}
                 >
                   <span>{menu.name}</span>
-                  <svg class="h-5 w-5 fill-current transition-transform duration-200" id="dropdown-icon" viewBox="0 0 20 20">
+                  <svg class="h-4 w-4 fill-current transition-transform duration-300 dropdown-icon" viewBox="0 0 20 20">
                     <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
                   </svg>
                 </button>
-                <ul 
-                  id="dropdown-menu" 
-                  class="nav-dropdown-list hidden !block-important position-style bg-white shadow-lg rounded p-2 min-w-[200px] z-50 text-center mx-auto my-2 md:my-0 md:absolute left-1/2 md:-translate-x-1/2 top-full"
+                
+                {/* 👑 SILVER ANIMATED BORDER DROPDOWN BOX */}
+                <div 
+                  id={`dropdown-${index}`} 
+                  class="nav-dropdown-list silver-animated-border hidden min-w-[220px] rounded-xl z-50 text-center mx-auto my-2"
                 >
-                  {menu.children?.map((child) => (
-                    <li class="nav-dropdown-item py-2">
-                      <a href={child.url} class="nav-dropdown-link block hover:text-primary transition text-center w-full">
-                        {child.name}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
+                  <ul class="inner-dropdown bg-[#0c0d10] rounded-xl p-2 w-full h-full relative z-10">
+                    {menu.children?.map((child) => (
+                      <li class="py-1.5">
+                        <a 
+                          href={child.url} 
+                          class="block px-4 py-2 text-sm text-white/70 hover:text-[#01AD9F] hover:bg-white/[0.03] rounded-lg transition duration-200 text-center w-full font-medium"
+                        >
+                          {child.name}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </li>
             ) : (
               <li class="nav-item flex justify-center">
-                <a href={menu.url} class="nav-link block text-center w-full">
+                <a 
+                  href={menu.url} 
+                  class="nav-link block text-center w-full text-white/80 hover:text-[#01AD9F] font-semibold py-2 px-4 transition duration-200"
+                >
                   {menu.name}
                 </a>
               </li>
@@ -89,9 +108,11 @@ const { main }: { main: NavigationLink[] } = menu;
         ))
       }
     </ul>
-    <div class="order-1 ml-auto flex md:order-2 md:ml-0">
+
+    {/* SEARCH ICON BUTTON */}
+    <div class="order-1 ml-auto flex md:ml-0">
       <a
-        class="mr-4 inline-block cursor-pointer p-2 text-xl text-dark transition hover:text-primary md:mr-0"
+        class="inline-block cursor-pointer p-2.5 text-xl text-white/80 transition-all duration-300 hover:text-[#01AD9F] hover:scale-110 rounded-xl bg-white/[0.02] hover:bg-white/[0.06] border border-white/[0.05]"
         href="/search"
         title="search"
         aria-label="search"
@@ -102,60 +123,167 @@ const { main }: { main: NavigationLink[] } = menu;
   </nav>
 </header>
 
-<style>
-  /* පරණ CSS වල තියෙන ඇද හැදීමට වෙනම ස්ටයිල් එකක් */
+<style is:global>
+  .nav-link {
+    font-family: inherit;
+  }
+
+  .navbar-nav {
+    background-color: #060709 !important;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 1rem;
+    padding: 1rem;
+    margin-top: 1rem;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  }
+  
   .nav-dropdown-list {
-    text-align: center !important;
+    position: relative !important;
+    left: 0 !important;
+    transform: none !important;
+    width: 100% !important;
+    margin-top: 0.5rem !important;
   }
-  .nav-dropdown-list a {
-    text-align: center !important;
-    display: block !important;
+
+  /* ==========================================================
+     ✨ PREMIUM TWO-WAY SILVER LAVA FLOW BORDER ANIMATION
+     ========================================================== */
+  .silver-animated-border {
+    position: absolute;
+    padding: 1.5px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.04);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), 0 0 15px rgba(255, 255, 255, 0.03);
   }
-  /* මොබයිල් වලදී මැදටම තියාගන්න */
-  @media (max-width: 767px) {
-    #dropdown-menu {
-      width: 90% !important;
-      max-width: 250px !important;
-      float: none !important;
+
+  .silver-animated-border::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+      45deg, 
+      transparent 0%, 
+      rgba(255, 255, 255, 0.02) 25%, 
+      rgba(255, 255, 255, 0.2) 40%, 
+      #ffffff 50%, 
+      rgba(255, 255, 255, 0.2) 60%, 
+      rgba(255, 255, 255, 0.02) 75%, 
+      transparent 100%
+    );
+    animation: silverLavaFlow 2.5s cubic-bezier(0.445, 0.05, 0.55, 0.95) infinite;
+  }
+
+  @keyframes silverLavaFlow {
+    0% {
+      transform: rotate(0deg) scale(1);
     }
+    50% {
+      transform: rotate(180deg) scale(1.05);
+    }
+    100% {
+      transform: rotate(360deg) scale(1);
+    }
+  }
+
+  #nav-toggle:checked ~ #show-button {
+    display: none !important;
+  }
+  #nav-toggle:checked ~ #hide-button {
+    display: flex !important;
   }
 </style>
 
 <script>
-  function initDropdown() {
-    const dropdownBtn = document.getElementById("dropdown-btn");
-    const dropdownMenu = document.getElementById("dropdown-menu");
-    const dropdownIcon = document.getElementById("dropdown-icon");
+  // ✅ ROOT FIX: Global click listener එක module-scope variable එකක ගබඩා කර,
+  // initHeaderLogic() සෑම astro:page-load වලදීත් run වෙද්දී පැරණි listener එක
+  // පළමුව ඉවත් කරයි. නැතිනම් listeners accumulate වී, search input එක click/focus
+  // කරද්දී "outside click" handler එක ක්‍රියාත්මක වී navToggle change event
+  // dispatch කරයි → cascade re-render → persisted React island reset වෙනවා.
+  let outsideClickHandler: ((e: MouseEvent) => void) | null = null;
 
-    if (dropdownBtn && dropdownMenu) {
-      dropdownBtn.replaceWith(dropdownBtn.cloneNode(true));
-      const newBtn = document.getElementById("dropdown-btn");
+  function initHeaderLogic() {
+    const dropdownButtons = document.querySelectorAll(".nav-dropdown-btn");
+    const navToggle = document.getElementById("nav-toggle") as HTMLInputElement | null;
+    const headerElement = document.getElementById("site-header");
 
-      newBtn?.addEventListener("click", (e) => {
-        e.stopPropagation();
-        const isHidden = dropdownMenu.classList.contains("hidden");
-        
-        if (isHidden) {
-          dropdownMenu.classList.remove("hidden");
-          dropdownIcon?.classList.add("rotate-180");
-          newBtn.setAttribute("aria-expanded", "true");
-        } else {
-          dropdownMenu.classList.add("hidden");
-          dropdownIcon?.classList.remove("rotate-180");
-          newBtn.setAttribute("aria-expanded", "false");
-        }
-      });
+    dropdownButtons.forEach((btn) => {
+      // ✅ cloneNode pattern දිගටම පවතී — duplicate listeners on the button itself avoid කරයි
+      const newBtn = btn.cloneNode(true) as HTMLButtonElement;
+      btn.parentNode?.replaceChild(newBtn, btn);
 
-      document.addEventListener("click", (e) => {
-        if (!newBtn?.contains(e.target as Node) && !dropdownMenu.contains(e.target as Node)) {
-          dropdownMenu.classList.add("hidden");
-          dropdownIcon?.classList.remove("rotate-180");
-          newBtn?.setAttribute("aria-expanded", "false");
-        }
-      });
+      const targetId = newBtn.getAttribute("data-dropdown-target");
+      const menu = document.getElementById(targetId || "");
+      const icon = newBtn.querySelector(".dropdown-icon");
+
+      if (newBtn && menu) {
+        newBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+
+          document.querySelectorAll(".nav-dropdown-list").forEach((m) => {
+            if (m.id !== targetId) {
+              m.classList.add("hidden");
+              m.parentElement?.querySelector(".dropdown-icon")?.classList.remove("rotate-180");
+              m.parentElement?.querySelector(".nav-dropdown-btn")?.setAttribute("aria-expanded", "false");
+            }
+          });
+
+          const isHidden = menu.classList.contains("hidden");
+          if (isHidden) {
+            menu.classList.remove("hidden");
+            icon?.classList.add("rotate-180");
+            newBtn.setAttribute("aria-expanded", "true");
+          } else {
+            menu.classList.add("hidden");
+            icon?.classList.remove("rotate-180");
+            newBtn.setAttribute("aria-expanded", "false");
+          }
+        });
+      }
+    });
+
+    // ✅ FIX: පැරණි document-level listener එක තිබේ නම් පළමුව remove කරන්න
+    if (outsideClickHandler) {
+      document.removeEventListener("click", outsideClickHandler);
+      outsideClickHandler = null;
     }
+
+    outsideClickHandler = (e: MouseEvent) => {
+      const target = e.target as Node;
+
+      if (headerElement && !headerElement.contains(target)) {
+        document.querySelectorAll(".nav-dropdown-list").forEach((menu) => {
+          menu.classList.add("hidden");
+          const parent = menu.parentElement;
+          parent?.querySelector(".dropdown-icon")?.classList.remove("rotate-180");
+          parent?.querySelector(".nav-dropdown-btn")?.setAttribute("aria-expanded", "false");
+        });
+
+        // ✅ FIX: navToggle already unchecked නම් event dispatch නොකරන්න —
+        // අනවශ්‍ය "change" events ඇතිවීම නවතී (cascade re-render root cause)
+        if (navToggle && navToggle.checked) {
+          navToggle.checked = false;
+          navToggle.dispatchEvent(new Event("change"));
+        }
+      }
+    };
+
+    document.addEventListener("click", outsideClickHandler);
   }
 
-  document.addEventListener("DOMContentLoaded", initDropdown);
-  document.addEventListener("astro:page-load", initDropdown);
+  // ✅ Astro Lifecycle — DOMContentLoaded සහ astro:page-load දෙකේදීම
+  // නමුත් දැන් cleanup logic එක නිසා listener accumulation නෑ
+  document.addEventListener("DOMContentLoaded", initHeaderLogic);
+  document.addEventListener("astro:page-load", initHeaderLogic);
+
+  // ✅ EXTRA SAFETY: astro:before-swap වෙද්දී listener cleanup —
+  // page transition අතරතුර stale handler trigger වීම සම්පූර්ණයෙන් වළක්වයි
+  document.addEventListener("astro:before-swap", () => {
+    if (outsideClickHandler) {
+      document.removeEventListener("click", outsideClickHandler);
+      outsideClickHandler = null;
+    }
+  });
 </script>
