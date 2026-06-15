@@ -53,19 +53,14 @@ const finalImageUrl = image
     ? image
     : `${cleanBaseUrl}${image.startsWith("/") ? image : "/" + image}`
   : `${cleanBaseUrl}${config.metadata.meta_image.startsWith("/") ? config.metadata.meta_image : "/" + config.metadata.meta_image}`;
-
-// ✅ Font preconnect — Astro Font component use කරන origins පමණයි
-const usesGoogleFonts = fontEntries.length > 0;
 ---
 
 <!doctype html>
 <html lang="si" class="bg-[#010203]">
   <head>
-    <!-- 1️⃣ Charset & Viewport — MUST be first -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
 
-    <!-- 2️⃣ Critical inline CSS — render-blocking flash වළකන්න -->
     <style>
       html, body {
         background-color: #010203;
@@ -76,24 +71,14 @@ const usesGoogleFonts = fontEntries.length > 0;
       #main-content { min-height: 60vh; }
     </style>
 
-    <!-- 3️⃣ Favicon -->
     <link rel="shortcut icon" href={config.site.favicon} />
 
-    <!-- 4️⃣ Google Fonts preconnect — fonts use කරනවා නම් පමණයි -->
-    {usesGoogleFonts && (
-      <>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-      </>
-    )}
-
-    <!-- 5️⃣ Font preload — LCP font block වීම වළකන්න -->
+    <!-- ✅ Font preload — preconnect නැහැ, Astro Font component auto inject කරයි -->
     {fontEntries.map(([key]) => {
       const cssVar = `--font-${key}` as any;
       return <Font cssVariable={cssVar} preload />;
     })}
 
-    <!-- 6️⃣ Theme meta -->
     <meta name="theme-color" content="#010203" />
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#010203" />
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#010203" />
@@ -102,22 +87,18 @@ const usesGoogleFonts = fontEntries.length > 0;
     <meta name="generator" content={Astro.generator} />
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
-    <!-- 7️⃣ Title & Canonical -->
     <title>{calculatedTitle}</title>
     <link rel="canonical" href={currentCanonical} />
 
-    <!-- 8️⃣ Robots -->
     {noindex
       ? <meta name="robots" content="noindex,nofollow" />
       : <meta name="robots" content="index,follow,max-image-preview:large" />
     }
 
-    <!-- 9️⃣ Core SEO -->
     <meta name="description" content={calculatedDescription} />
     <meta name="keywords" content={siteKeywords} />
     <meta name="author" content={config.metadata.meta_author} />
 
-    <!-- 🔟 Open Graph -->
     <meta property="og:title" content={calculatedTitle} />
     <meta property="og:description" content={calculatedDescription} />
     <meta property="og:type" content="website" />
@@ -129,13 +110,11 @@ const usesGoogleFonts = fontEntries.length > 0;
     <meta property="og:image:height" content="630" />
     <meta property="og:site_name" content={config.site.title} />
 
-    <!-- 1️⃣1️⃣ Twitter Cards -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={calculatedTitle} />
     <meta name="twitter:description" content={calculatedDescription} />
     <meta name="twitter:image" content={finalImageUrl} />
 
-    <!-- 1️⃣2️⃣ ClientRouter — සියල්ලටම පසුව, reflow minimize කිරීමට -->
     <ClientRouter />
   </head>
 
