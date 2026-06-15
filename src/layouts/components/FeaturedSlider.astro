@@ -1,29 +1,31 @@
 ---
 import { humanize } from "@/lib/utils/textConverter";
 
+// ✅ FIX: Blogger URLs → local images
+// public/posts/ folder එකේ දැනටමත් තිබෙන files use කරනවා
 const demoSlides = [
   {
     id: "mali-wal-katha",
     title: "මේල්ලිම් මෙම් - Mali Wal Katha",
-    image: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh2ZpuNRWZgp8bePG3R3eeD_ZXZAeyEciXJ5PCwoYe0-eT_KpR06b8Rh-MapoGN9ib9zJJ9dswr8I5uuqbQzNuxxZFQLBPFhvrrp4ZkPYfiE9N0XWN6Q6xW7n8ET5UxGJmU0_QDkfaJKhIwTBtsPlj12gfGN4xSLNe5e0fQziL8Iq_HO5NolS4JC_jCZdw/s708/1000021201.jpg",
+    image: "/images/posts/01.jpg",
     category: "Wal Katha"
   },
   {
     id: "sinhala-lip-katha",
     title: "තුස්ලිම් මිනිසා - සිංහල ලිප් කතා",
-    image: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjqGKoIkxKvTb-z2d5JqA5-6h_Tp_s9B1iDwcrXfhlpYUUMtjWKuEvtcp0fEaDK4fx6hMK-9e9cUwGT7QdsEFFsdr6M-pi8nGfD0lbLK72Pwte3vhidlUjIkyfNrKKfBT3hMpynFT5nuwaEePOGUiZv6DBhOI4onVzsIzjyqVTB4yMx7mGV0BkjMHr0uBY/s645/1000021219.jpg",
+    image: "/images/posts/02.jpg",
     category: "Wela Katha"
   },
   {
     id: "new-wal-katha",
     title: "තේශය ලබා - New Wal Katha",
-    image: "https://blogger.googleusercontent.com/img/a/AVvXsEitbUL7Rq290BuqoH832SRuty1Uy2rgX0LTqs9oA5J8GLSk8lMWTYd7eL_8Bdg1BTyof9hMkkJr0BF-Rdyzmms0OdUUhliH-0WHHPja9Vn1rjNZ6zs2WFPVoyM6KSV337NOLJqnrEoiULB-48Pt7yRG6mNoL-gsydPNgjFgFki5NGFITvziTHNkRYzSl0M=s845",
+    image: "/images/posts/03.jpg",
     category: "Sinhala Stories"
   },
   {
     id: "popular-wal-katha",
     title: "නවතම සිංහල වල් කතා එකතුව - Popular Stories",
-    image: "https://blogger.googleusercontent.com/img/a/AVvXsEj-M493Zh8Vr8PEHL8uiKoKVMU45vNqM17H9fa_F6XuByYc7YC7l3OwhuGRL8oqWvq3gnTcD_3A0zlRhGDJoK_Wiljw3ftllija7XiebyhxKjhrz8FJpGeoexMXrDuVhBYv4w8e4RVPCIqcyEDjXdC9N33JxTXSsmjsBh1QWfIJM14I5znCccGriX9vdDQ=s619",
+    image: "/images/posts/04.jpg",
     category: "True Story"
   }
 ];
@@ -35,10 +37,6 @@ const demoSlides = [
       <div class="w-full flex-shrink-0 relative" style="width: 25%;">
         <a href={`/blog/${slide.id}/`} class="block w-full h-full group" aria-label={`Read story: ${slide.title}`}>
           <div class="relative w-full aspect-[16/8] sm:aspect-[21/8] md:aspect-[24/8] bg-[#010203] overflow-hidden">
-
-            {/* ✅ FIX: External images — <img> tag use කරන්න
-                Astro <Image> external URLs optimize කරන්නේ නැහැ,
-                ඒ නිසා fetchpriority සහ loading control direct img tag එකෙන් */}
             <img
               src={slide.image}
               alt={slide.title}
@@ -49,7 +47,6 @@ const demoSlides = [
               fetchpriority={index === 0 ? "high" : "low"}
               class="w-full h-full object-cover object-center transition duration-500 group-hover:scale-[1.02]"
             />
-
           </div>
 
           <div class="absolute bottom-3 left-4 z-10">
@@ -121,7 +118,6 @@ const demoSlides = [
       });
     });
 
-    // ✅ FIX: Touch/swipe support mobile සඳහා
     let touchStartX = 0;
     let touchEndX = 0;
 
