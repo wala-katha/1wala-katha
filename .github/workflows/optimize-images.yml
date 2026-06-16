@@ -31,11 +31,11 @@ jobs:
           import { readdirSync } from 'fs';
 
           const folders = [
-            { dir: 'public/images/authors', width: 400, height: 400 },
-            { dir: 'public/images/slider', width: 1920, height: 720 },
+            { dir: 'public/images/authors', width: 400, height: 400, lossless: true },
+            { dir: 'public/images/slider', width: 1200, height: 450, lossless: true },
           ];
 
-          for (const { dir, width, height } of folders) {
+          for (const { dir, width, height, lossless } of folders) {
             for (const file of readdirSync(dir)) {
               if (/\.(jpg|jpeg|png)$/i.test(file)) {
                 const out = dir + '/' + file.replace(/\.[^.]+$/, '.webp');
@@ -43,13 +43,11 @@ jobs:
                   .resize(width, height, {
                     fit: 'cover',
                     kernel: sharp.kernel.lanczos3,
-                    fastShrinkOn: false,
                   })
                   .webp({
                     quality: 100,
                     lossless: true,
                     effort: 6,
-                    smartSubsample: true,
                   })
                   .toFile(out);
                 console.log('Done:', dir + '/' + file, '->', out);
@@ -64,5 +62,5 @@ jobs:
           git config user.email "actions@github.com"
           git add public/images/authors/*.webp
           git add public/images/slider/*.webp
-          git diff --staged --quiet || git commit -m "Auto: optimize all images lossless WebP"
+          git diff --staged --quiet || git commit -m "Auto: optimize all images to WebP lossless"
           git push
