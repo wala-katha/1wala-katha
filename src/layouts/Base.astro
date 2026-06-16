@@ -53,6 +53,9 @@ const finalImageUrl = image
     ? image
     : `${cleanBaseUrl}${image.startsWith("/") ? image : "/" + image}`
   : `${cleanBaseUrl}${config.metadata.meta_image.startsWith("/") ? config.metadata.meta_image : "/" + config.metadata.meta_image}`;
+
+// ✅ Home page පමණයි slider preload කරනවා
+const isHomePage = Astro.url.pathname === "/" || Astro.url.pathname === "";
 ---
 
 <!doctype html>
@@ -61,6 +64,7 @@ const finalImageUrl = image
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
 
+    <!-- ✅ Critical inline CSS — render flash වළකන්න -->
     <style>
       html, body {
         background-color: #010203;
@@ -73,7 +77,17 @@ const finalImageUrl = image
 
     <link rel="shortcut icon" href={config.site.favicon} />
 
-    <!-- ✅ Font preload — preconnect නැහැ, Astro Font component auto inject කරයි -->
+    <!-- ✅ LCP fix: Home page slider first image preload -->
+    {isHomePage && (
+      <link
+        rel="preload"
+        as="image"
+        href="/images/slider/slide-1.webp"
+        fetchpriority="high"
+      />
+    )}
+
+    <!-- ✅ Font preload -->
     {fontEntries.map(([key]) => {
       const cssVar = `--font-${key}` as any;
       return <Font cssVariable={cssVar} preload />;
@@ -115,6 +129,7 @@ const finalImageUrl = image
     <meta name="twitter:description" content={calculatedDescription} />
     <meta name="twitter:image" content={finalImageUrl} />
 
+    <!-- ✅ ClientRouter — අවසානයට දාන්න reflow minimize කිරීමට -->
     <ClientRouter />
   </head>
 
