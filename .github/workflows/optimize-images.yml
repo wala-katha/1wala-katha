@@ -1,4 +1,4 @@
-name: Optimize Author Images
+name: Optimize All Images
 
 on:
   push:
@@ -22,7 +22,7 @@ jobs:
           npm init -y
           npm install sharp
 
-      - name: Resize all images
+      - name: Optimize all images
         run: |
           node --input-type=module << 'EOF'
           import { createRequire } from 'module';
@@ -31,15 +31,12 @@ jobs:
           import { readdirSync, existsSync } from 'fs';
 
           const folders = [
-            // Authors: 25x25 display → 50x50 optimal (2x retina)
-            { dir: 'public/images/authors', width: 50, height: 50, lossless: false, quality: 90 },
-            // Slider: 882x331 display → 900x338 optimal
-            { dir: 'public/images/slider', width: 900, height: 338, lossless: false, quality: 90 },
-            // Posts: optimize existing JPGs
-            { dir: 'public/images/posts', width: 750, height: 500, lossless: false, quality: 85 },
+            { dir: 'public/images/authors', width: 50, height: 50 },
+            { dir: 'public/images/slider', width: 900, height: 338 },
+            { dir: 'public/images/posts', width: 750, height: 500 },
           ];
 
-          for (const { dir, width, height, lossless, quality } of folders) {
+          for (const { dir, width, height } of folders) {
             if (!existsSync(dir)) continue;
             for (const file of readdirSync(dir)) {
               if (/\.(jpg|jpeg|png)$/i.test(file)) {
@@ -51,21 +48,30 @@ jobs:
                     kernel: sharp.kernel.lanczos3,
                     withoutEnlargement: true,
                   })
-                  .webp({ quality, effort: 6 })
+                  .sharpen({
+                    sigma: 1.2,
+                    m1: 1.5,
+                    m2: 0.7,
+                    x1: 2.0,
+                    y2: 10.0,
+                    y3: 20.0,
+                  })
+                  .webp({ quality: 100, lossless: true, effort: 6 })
                   .toFile(out);
                 console.log('Done:', input, '->', out);
               }
             }
           }
 
-          // Logo separate — maintain aspect ratio
           if (existsSync('public/images/logo.png')) {
             await sharp('public/images/logo.png')
-              .resize(300, null, {
+              .resize(300, 50, {
+                fit: 'contain',
+                background: { r: 0, g: 0, b: 0, alpha: 0 },
                 kernel: sharp.kernel.lanczos3,
-                withoutEnlargement: true,
               })
-              .webp({ quality: 90, effort: 6 })
+              .sharpen({ sigma: 0.8 })
+              .webp({ quality: 100, lossless: true, effort: 6 })
               .toFile('public/images/logo.webp');
             console.log('Done: logo.png -> logo.webp');
           }
@@ -79,5 +85,5 @@ jobs:
           git add public/images/slider/*.webp || true
           git add public/images/posts/*.webp || true
           git add public/images/logo.webp || true
-          git diff --staged --quiet || git commit -m "Auto: optimize all images with correct display sizes"
+          git diff --staged --quiet || git commit -m "Auto: optimize images with sharpening"
           git push
