@@ -32,7 +32,7 @@ jobs:
 
           const folders = [
             { dir: 'public/images/authors', width: 400, height: 400, lossless: true },
-            { dir: 'public/images/slider', width: 1200, height: 450, lossless: false },
+            { dir: 'public/images/slider', width: 1200, height: 450, lossless: true },
           ];
 
           for (const { dir, width, height, lossless } of folders) {
@@ -44,7 +44,11 @@ jobs:
                     fit: 'cover',
                     kernel: sharp.kernel.lanczos3,
                   })
-                  .webp({ quality: lossless ? 100 : 85, lossless, effort: 6 })
+                  .webp({
+                    quality: 100,
+                    lossless: true,
+                    effort: 6,
+                  })
                   .toFile(out);
                 console.log('Done:', dir + '/' + file, '->', out);
               }
@@ -58,5 +62,5 @@ jobs:
           git config user.email "actions@github.com"
           git add public/images/authors/*.webp
           git add public/images/slider/*.webp
-          git diff --staged --quiet || git commit -m "Auto: optimize all images to WebP"
+          git diff --staged --quiet || git commit -m "Auto: optimize all images to WebP lossless"
           git push
